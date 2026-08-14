@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Prompt Management</title>
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="bg-body-tertiary">
+<div class="d-flex min-vh-100 flex-column flex-md-row">
+
+  <!-- Sidebar -->
+  <aside class="sidebar offcanvas-md offcanvas-start" tabindex="-1" id="sidebar">
+    <div class="offcanvas-header d-md-none">
+      <h5 class="offcanvas-title text-white">Menu</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#sidebar"></button>
+    </div>
+    <div class="offcanvas-body flex-column p-0">
+      <div class="sidebar-brand">
+        <div class="logo">📋</div>
+        <h1>Regulatory Circular<br>Analyzer</h1>
+      </div>
+      <nav class="sidebar-nav" id="sidebarNav"></nav>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main flex-grow-1">
+    <div class="d-md-none d-flex justify-content-between align-items-center p-3 bg-white border-bottom shadow-sm">
+      <div class="fw-bold fs-5"><span class="me-2">🛡️</span>Admin — Prompts</div>
+      <button class="btn btn-light border" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">☰</button>
+    </div>
+
+    <div class="container-fluid p-3 p-md-4 p-xl-5">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+          <h2 class="fw-bold text-navy mb-1">🛡️ Prompt Management</h2>
+          <p class="text-secondary mb-0">Edit the system and user prompts used by the AI analysis engine.</p>
+        </div>
+        <div class="d-flex gap-2">
+          <button id="saveBtn" class="btn btn-primary rounded-pill px-4">💾 Save Prompts</button>
+          <button id="resetBtn" class="btn btn-outline-danger rounded-pill px-4">🔄 Reset to Defaults</button>
+        </div>
+      </div>
+
+      <!-- System Prompt -->
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold text-navy mb-0">System Prompt</h5>
+            <span id="systemBadge" class="badge rounded-pill"></span>
+          </div>
+          <p class="text-secondary small mb-0 mt-1">This defines the AI's persona and classification instructions.</p>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <textarea id="systemPrompt" class="form-control font-monospace" rows="18" style="font-size:.85rem;"></textarea>
+        </div>
+      </div>
+
+      <!-- User Prompt Template -->
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold text-navy mb-0">User Prompt Template</h5>
+            <span id="userBadge" class="badge rounded-pill"></span>
+          </div>
+          <p class="text-secondary small mb-0 mt-1">
+            Template for each paragraph sent to the AI. Use placeholders:
+            <code>{paragraph}</code>, <code>{paragraph_number}</code>, <code>{total_paragraphs}</code>
+          </p>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <textarea id="userPrompt" class="form-control font-monospace" rows="8" style="font-size:.85rem;"></textarea>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app.js?v=2"></script>
+<script src="/js/admin.js?v=2"></script>
+</body>
+</html>

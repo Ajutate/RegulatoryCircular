@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Document | Regulatory Analyzer</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body class="bg-body-tertiary">
+  <div class="d-flex min-vh-100 flex-column flex-md-row">
+
+    <!-- Sidebar -->
+    <aside class="sidebar offcanvas-md offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+      <div class="offcanvas-header d-md-none">
+        <h5 class="offcanvas-title text-white" id="sidebarLabel">Menu</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#sidebar"
+          aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body flex-column p-0">
+        <div class="sidebar-brand">
+          <div class="logo">📋</div>
+          <h1>Regulatory Circular<br>Analyzer</h1>
+          <!-- <p>Powered by GenAI · LangChain · LiteLLM</p> -->
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav"></nav>
+        <div class="sidebar-status mt-auto p-3">
+          <h4 class="text-uppercase text-secondary" style="font-size:0.75rem; letter-spacing:1px; margin-bottom:1rem;">
+            Status</h4>
+          <div class="d-flex align-items-center mb-2">
+            <div class="status-dot me-2" id="statusDoc"></div><span class="text-white" style="font-size:0.9rem;">Document uploaded</span>
+          </div>
+          <div class="d-flex align-items-center">
+            <div class="status-dot me-2" id="statusAna"></div><span class="text-white" style="font-size:0.9rem;">Analysis complete</span>
+          </div>
+          <div class="mt-2 text-secondary" id="statusCount" style="display:none;font-size:.75rem;"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main flex-grow-1">
+      <!-- Mobile top bar -->
+      <div class="d-md-none d-flex justify-content-between align-items-center p-3 bg-white border-bottom shadow-sm">
+        <div class="fw-bold fs-5"><span class="me-2">📤</span>Upload Document</div>
+        <button class="btn btn-light border" type="button" data-bs-toggle="offcanvas"
+          data-bs-target="#sidebar">☰</button>
+      </div>
+
+      <div class="container-fluid p-3 p-md-4 p-xl-5">
+        <div class="mb-4">
+          <h2 class="fw-bold text-navy">📤 Upload Document</h2>
+          <p class="text-secondary">Upload a PDF or DOCX regulatory circular. The extractor parses the text and splits
+            it into paragraphs for AI analysis.</p>
+        </div>
+
+        <!-- Upload zone -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="upload-zone text-center p-5 rounded-4 border-2 border-dashed" id="uploadZone"
+            style="border-color: #cbd5e1; background-color: #f8fafc; cursor: pointer; transition: all 0.2s;">
+            <input type="file" id="fileInput" accept=".pdf,.docx" />
+            <div class="upload-icon">📂</div>
+            <h3>Drag &amp; drop your document here</h3>
+            <p>or click to browse files</p>
+            <div class="file-types d-flex justify-content-center gap-2 mt-3">
+              <span class="badge bg-danger">PDF</span>
+              <span class="badge bg-primary">DOCX</span>
+            </div>
+            <p class="text-secondary small mt-3 mb-0">Max ~50 MB · Text-based documents only</p>
+          </div>
+        </div>
+
+        <!-- Processing status -->
+        <div id="processingSection" class="mb-4" style="display:none;">
+          <div class="card border-0 shadow-sm p-4 rounded-4">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+              <span id="processingMsg" class="fw-bold text-navy">Extracting document…</span>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-bar" id="uploadProgress" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results section (hidden until upload) -->
+        <div id="resultsSection" style="display:none;">
+
+          <!-- Alert -->
+          <div class="alert alert-success d-flex align-items-center rounded-3 border-0" id="successAlert">
+            <span class="fs-4 me-3">✅</span>
+            <span id="successMsg"></span>
+          </div>
+
+          <!-- Metrics -->
+          <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-xl-3">
+              <div class="card h-100 border-0 shadow-sm p-3 rounded-4">
+                <div class="text-secondary small fw-bold text-uppercase">File Name</div>
+                <div class="fs-6 text-navy fw-bold text-truncate" id="metaName" title="—">—</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+              <div class="card h-100 border-0 shadow-sm p-3 rounded-4">
+                <div class="text-secondary small fw-bold text-uppercase">Format</div>
+                <div class="fs-5 text-navy fw-bold" id="metaFormat">—</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+              <div class="card h-100 border-0 shadow-sm p-3 rounded-4">
+                <div class="text-secondary small fw-bold text-uppercase">File Size</div>
+                <div class="fs-5 text-navy fw-bold" id="metaSize">—</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+              <div class="card h-100 border-0 shadow-sm p-3 rounded-4">
+                <div class="text-secondary small fw-bold text-uppercase">Paragraphs Found</div>
+                <div class="fs-5 text-navy fw-bold" id="metaParas">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preview columns -->
+          <div class="row g-4 mb-4">
+
+            <!-- Text preview -->
+            <div class="col-lg-6">
+              <div class="card h-100 border-0 shadow-sm p-4 rounded-4">
+                <h5 class="fw-bold text-navy mb-3">🔍 Extracted Text Preview</h5>
+                <div class="p-3 bg-light rounded-3 overflow-auto" id="textPreview"
+                  style="max-height:280px; font-size: 0.85rem; line-height: 1.6;"></div>
+              </div>
+            </div>
+
+            <!-- Paragraph selector -->
+            <div class="col-lg-6">
+              <div class="card h-100 border-0 shadow-sm p-4 rounded-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <h5 class="fw-bold text-navy m-0">📝 Paragraph Preview</h5>
+                  <select id="paraSelect" class="form-select form-select-sm w-auto shadow-none"></select>
+                </div>
+                <div class="p-3 bg-light rounded-3 overflow-auto" id="paraPreview"
+                  style="max-height:280px; font-size: 0.85rem; line-height: 1.6;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Document metadata -->
+          <div class="card border-0 shadow-sm p-4 rounded-4 mb-4" id="metaCard" style="display:none;">
+            <h5 class="fw-bold text-navy mb-3">📎 Document Metadata</h5>
+            <div id="metaDetails" class="d-grid gap-2 text-secondary small"></div>
+          </div>
+
+          <!-- CTA -->
+          <div class="d-flex align-items-center gap-3 flex-wrap">
+            <a href="analyze.html" class="btn btn-primary btn-lg rounded-pill px-4 shadow-sm" id="proceedBtn">
+              ➡️ Proceed to Analysis
+            </a>
+            <button class="btn btn-outline-secondary rounded-pill px-4" id="resetBtn">🗑️ Upload Different
+              Document</button>
+          </div>
+        </div><!-- /resultsSection -->
+
+      </div><!-- /container -->
+    </main>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/app.js?v=2"></script>
+  <script src="/js/upload.js?v=2"></script>
+</body>
+
+</html>

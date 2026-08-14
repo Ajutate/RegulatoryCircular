@@ -1,0 +1,14 @@
+fastapi>=0.141.1
+uvicorn>=0.38.0
+litellm>=1.96.0
+langchain-core>=1.2.13
+openpyxl>=3.1.5
+PyMuPDF>=1.26.3
+python-docx>=1.2.0
+sqlalchemy>=2.0.44
+sse-starlette>=2.3.5
+passlib>=1.7.4
+bcrypt>=4.3.0
+pydantic>=2.13.4
+pydantic-settings>=2.15.0
+python-multipart>=0.0.32

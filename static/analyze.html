@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analyze Document | Regulatory Analyzer</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body class="bg-body-tertiary">
+  <div class="d-flex min-vh-100 flex-column flex-md-row">
+
+    <!-- Sidebar -->
+    <aside class="sidebar offcanvas-md offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+      <div class="offcanvas-header d-md-none">
+        <h5 class="offcanvas-title text-white" id="sidebarLabel">Menu</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#sidebar"
+          aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body flex-column p-0">
+        <div class="sidebar-brand">
+          <div class="logo">📋</div>
+          <h1>Regulatory Circular<br>Analyzer</h1>
+
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav"></nav>
+        <div class="sidebar-status mt-auto p-3">
+          <h4 class="text-uppercase text-secondary" style="font-size:0.75rem; letter-spacing:1px; margin-bottom:1rem;">
+            Status</h4>
+          <div class="d-flex align-items-center mb-2">
+            <div class="status-dot me-2" id="statusDoc"></div><span class="text-white" style="font-size:0.9rem;">Document uploaded</span>
+          </div>
+          <div class="d-flex align-items-center">
+            <div class="status-dot me-2" id="statusAna"></div><span class="text-white" style="font-size:0.9rem;">Analysis complete</span>
+          </div>
+          <div class="mt-2 text-secondary" id="statusCount" style="display:none;font-size:.75rem;"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main flex-grow-1">
+      <!-- Mobile top bar -->
+      <div class="d-md-none d-flex justify-content-between align-items-center p-3 bg-white border-bottom shadow-sm">
+        <div class="fw-bold fs-5"><span class="me-2">🔍</span>Analyze Document</div>
+        <button class="btn btn-light border" type="button" data-bs-toggle="offcanvas"
+          data-bs-target="#sidebar">☰</button>
+      </div>
+
+      <div class="container-fluid p-3 p-md-4 p-xl-5">
+        <div class="mb-4">
+          <h2 class="fw-bold text-navy">🔍 Analyze Document</h2>
+          <p class="text-secondary">Each paragraph is classified by the AI across 10 regulatory dimensions. Results
+            stream in live as they are processed.</p>
+        </div>
+
+        <!-- No document alert -->
+        <div id="noDocAlert" style="display:none;">
+          <div class="alert alert-warning d-flex align-items-center rounded-3 border-0">
+            <span class="fs-4 me-3">⚠️</span>
+            <div>No document loaded. <a href="upload.html" class="fw-bold text-decoration-none"
+                style="color:#1e40af;">Upload a document first ↗</a></div>
+          </div>
+        </div>
+
+        <!-- Already complete banner -->
+        <div id="completeBanner" style="display:none;" class="mb-4">
+          <div class="alert alert-success d-flex align-items-center rounded-3 border-0">
+            <span class="fs-4 me-3">✅</span>
+            <span id="completeMsg" class="flex-grow-1"></span>
+            <a href="export.html" class="btn btn-success btn-sm ms-3 rounded-pill px-3">View Results ↗</a>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="reAnalyzeBtn">🔄 Re-Analyze</button>
+          </div>
+        </div>
+
+        <!-- Pre-analysis config (hidden once running) -->
+        <div id="configSection">
+          <!-- Document summary strip -->
+          <div class="row g-3 mb-4" id="docSummary" style="display:none;">
+            <div class="col-sm-4">
+              <div class="card h-100 border-0 shadow-sm p-3 rounded-4">
+                <div class="text-secondary small fw-bold text-uppercase">Document</div>
+                <div class="fs-6 text-navy fw-bold text-truncate" id="docName" title="—">—</div>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="card h-100 border-0 shadow-sm p-3 rounded-4">
+                <div class="text-secondary small fw-bold text-uppercase">Total Paragraphs</div>
+                <div class="fs-5 text-navy fw-bold" id="docParas">—</div>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="card h-100 border-0 shadow-sm p-3 rounded-4">
+                <div class="text-secondary small fw-bold text-uppercase">Max to Analyse</div>
+                <div class="fs-5 text-navy fw-bold" id="maxDisplay">All</div>
+              </div>
+            </div>
+          </div>
+
+
+
+          <!-- Settings -->
+          <div class="card border-0 shadow-sm rounded-4 mb-4" id="settingsCard">
+            <div class="card-body p-4">
+              <h5 class="fw-bold text-navy mb-3">⚙️ Analysis Settings</h5>
+              <div style="max-width:480px;">
+                <label class="form-label text-secondary small fw-bold">
+                  Max paragraphs to analyse (0 = all)
+                </label>
+                <div class="d-flex align-items-center gap-3">
+                  <input type="range" id="maxSlider" class="form-range flex-grow-1" min="0" max="100" value="0" />
+                  <input type="number" id="maxNum" class="form-control text-center" value="0" min="0"
+                    style="width: 80px;" />
+                </div>
+                <!-- <div class="alert alert-info d-flex align-items-center mt-3 py-2 border-0 rounded-3 small">
+                <span class="fs-5 me-2">💡</span>
+                <span>Set to 5–10 first to verify your LiteLLM connection, then re-run with all paragraphs.</span>
+              </div> -->
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-lg rounded-pill px-4 shadow-sm" id="startBtn">🤖 Start AI Analysis</button>
+        </div>
+
+        <!-- Progress section (shown while running) -->
+        <div id="progressSection" class="my-4" style="display:none;">
+          <div class="card border-0 shadow-sm p-4 rounded-4">
+            <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+              <div class="d-flex align-items-center gap-3">
+                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                <span id="progressLabel" class="fw-bold text-navy">Starting…</span>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <div class="text-secondary small" id="etaLabel"></div>
+                <button class="btn btn-outline-danger btn-sm rounded-pill px-3" id="cancelBtn" style="display:none;">Stop / Cancel</button>
+              </div>
+            </div>
+            <div class="progress mb-2" style="height: 10px;">
+              <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" id="mainProgress"
+                role="progressbar" style="width: 0%"></div>
+            </div>
+            <div class="d-flex justify-content-between text-secondary small fw-bold">
+              <span id="progressCount">0 / 0</span>
+              <span id="progressPct">0%</span>
+            </div>
+            <div id="lastResultSnippet" class="mt-3 p-3 bg-light rounded-3 text-secondary small"
+              style="min-height: 2.5rem;">
+              Waiting for first result…
+            </div>
+          </div>
+        </div>
+
+        <!-- Live results table -->
+        <div id="liveTableSection" class="mt-4" style="display:none;">
+          <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+            <h5 class="fw-bold text-navy m-0">📋 Live Results</h5>
+            <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill" id="liveCount"></span>
+          </div>
+          <div class="table-responsive rounded-4 shadow-sm border-0 bg-white" style="max-height:420px;">
+            <table class="table table-hover table-borderless mb-0" id="liveTable">
+              <thead class="table-light sticky-top" style="z-index:1;">
+                <tr>
+                  <th class="py-3 px-3">#</th>
+                  <th class="py-3 px-3">Para Type</th>
+                  <th class="py-3 px-3">Is Regulation Para Effective Date Provided</th>
+                  <th class="py-3 px-3">Business Unit</th>
+                  <th class="py-3 px-3">Theme</th>
+                  <th class="py-3 px-3">Control Objective Name</th>
+                  <th class="py-3 px-3">Level 1</th>
+                  <th class="py-3 px-3">Level 2</th>
+                  <th class="py-3 px-3">Actionable</th>
+                </tr>
+              </thead>
+              <tbody id="liveBody" class="border-top-0"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /container -->
+    </main>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/app.js?v=2"></script>
+  <script src="/js/analyze.js?v=2"></script>
+</body>
+
+</html>

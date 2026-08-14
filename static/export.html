@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Export Results | Regulatory Analyzer</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body class="bg-body-tertiary">
+  <div class="d-flex min-vh-100 flex-column flex-md-row">
+
+    <!-- Sidebar -->
+    <aside class="sidebar offcanvas-md offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+      <div class="offcanvas-header d-md-none">
+        <h5 class="offcanvas-title text-white" id="sidebarLabel">Menu</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#sidebar"
+          aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body flex-column p-0">
+        <div class="sidebar-brand">
+          <div class="logo">📋</div>
+          <h1>Regulatory Circular<br>Analyzer</h1>
+          <!-- <p>Powered by GenAI · LangChain · LiteLLM</p> -->
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav"></nav>
+        <div class="sidebar-status mt-auto p-3">
+          <h4 class="text-uppercase text-secondary" style="font-size:0.75rem; letter-spacing:1px; margin-bottom:1rem;">
+            Status</h4>
+          <div class="d-flex align-items-center mb-2">
+            <div class="status-dot me-2" id="statusDoc"></div><span class="text-white" style="font-size:0.9rem;">Document uploaded</span>
+          </div>
+          <div class="d-flex align-items-center">
+            <div class="status-dot me-2" id="statusAna"></div><span class="text-white" style="font-size:0.9rem;">Analysis complete</span>
+          </div>
+          <div class="mt-2 text-secondary" id="statusCount" style="display:none;font-size:.75rem;"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main flex-grow-1">
+      <!-- Mobile top bar -->
+      <div class="d-md-none d-flex justify-content-between align-items-center p-3 bg-white border-bottom shadow-sm">
+        <div class="fw-bold fs-5"><span class="me-2">📊</span>Export Results</div>
+        <button class="btn btn-light border" type="button" data-bs-toggle="offcanvas"
+          data-bs-target="#sidebar">☰</button>
+      </div>
+
+      <div class="container-fluid p-3 p-md-4 p-xl-5">
+        <div class="mb-4">
+          <h2 class="fw-bold text-navy">📊 Export Results</h2>
+          <p class="text-secondary">Review, filter and download the full regulatory analysis as a styled Excel report.
+          </p>
+        </div>
+
+        <!-- No results alert -->
+        <div id="noResultsAlert" style="display:none;">
+          <div class="alert alert-warning d-flex align-items-center rounded-3 border-0">
+            <span class="fs-4 me-3">⚠️</span>
+            <div>
+              No analysis results yet.
+              <a href="upload.html" class="fw-bold text-decoration-none" style="color:#1e40af;">Upload a document ↗</a>
+              then
+              <a href="analyze.html" class="fw-bold text-decoration-none" style="color:#1e40af;">run the analysis ↗</a>.
+            </div>
+          </div>
+        </div>
+
+        <!-- Content (shown once results available) -->
+        <div id="exportContent" style="display:none;">
+
+          <!-- Summary metrics -->
+          <div class="row g-3 mb-4" id="summaryMetrics"></div>
+
+          <!-- Charts -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-6">
+              <div class="card h-100 border-0 shadow-sm p-4 rounded-4">
+                <h5 class="fw-bold text-navy mb-3 text-center">Paragraphs by Business Unit</h5>
+                <div style="height: 300px;"><canvas id="buChart"></canvas></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card h-100 border-0 shadow-sm p-4 rounded-4">
+                <h5 class="fw-bold text-navy mb-3 text-center">Paragraphs by Theme</h5>
+                <div style="height: 300px;"><canvas id="themeChart"></canvas></div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="my-5 text-secondary opacity-25">
+
+          <!-- Filters -->
+          <div class="card border-0 shadow-sm p-4 rounded-4 mb-4">
+            <h5 class="fw-bold text-navy mb-3">🔎 Filter Results</h5>
+            <div class="row g-3 align-items-end mb-3">
+              <div class="col-md-4 col-lg-2">
+                <label class="form-label text-secondary small fw-bold mb-1">Business Unit</label>
+                <select id="filterBU" class="form-select form-select-sm">
+                  <option value="">All Business Units</option>
+                </select>
+              </div>
+              <div class="col-md-4 col-lg-2">
+                <label class="form-label text-secondary small fw-bold mb-1">Theme</label>
+                <select id="filterTheme" class="form-select form-select-sm">
+                  <option value="">All Themes</option>
+                </select>
+              </div>
+              <div class="col-md-4 col-lg-2">
+                <label class="form-label text-secondary small fw-bold mb-1">Para Type</label>
+                <select id="filterType" class="form-select form-select-sm">
+                  <option value="">All Types</option>
+                </select>
+              </div>
+              <div class="col-md-4 col-lg-2">
+                <label class="form-label text-secondary small fw-bold mb-1">Regulation para Effective Date</label>
+                <select id="filterDate" class="form-select form-select-sm">
+                  <option value="">All</option>
+                  <option value="Yes">Yes — has date</option>
+                  <option value="No">No — no date</option>
+                </select>
+              </div>
+              <div class="col-md-8 col-lg-4">
+                <label class="form-label text-secondary small fw-bold mb-1">Search text</label>
+                <input type="text" id="filterSearch" class="form-control form-control-sm"
+                  placeholder="Search paragraphs…" />
+              </div>
+            </div>
+            <div class="d-flex gap-3 align-items-center flex-wrap">
+              <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="clearFiltersBtn">✕ Clear
+                Filters</button>
+              <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill" id="filteredCount"></span>
+            </div>
+          </div>
+
+          <!-- Results table -->
+          <div class="table-responsive rounded-4 shadow-sm border-0 bg-white mb-4" style="max-height:500px;">
+            <table class="table table-hover table-borderless mb-0" id="resultsTable">
+              <thead class="table-light sticky-top" style="z-index:1;">
+                <tr>
+                  <th data-col="idx" class="py-3 px-3 cursor-pointer">#</th>
+                  <th data-col="para_type" class="py-3 px-3 cursor-pointer">Para Type <span
+                      class="sort-icon text-muted small">⇅</span></th>
+                  <th data-col="has_effective_date" class="py-3 px-3 cursor-pointer">Is Regulation Para Effective Date Provided <span
+                      class="sort-icon text-muted small">⇅</span></th>
+                  <th data-col="effective_date" class="py-3 px-3">Regulation para Effective Date</th>
+                  <th data-col="business_unit" class="py-3 px-3 cursor-pointer">Business Unit <span
+                      class="sort-icon text-muted small">⇅</span></th>
+                  <th data-col="theme" class="py-3 px-3 cursor-pointer">Theme <span
+                      class="sort-icon text-muted small">⇅</span></th>
+                  <th data-col="control_object_name" class="py-3 px-3">Control Objective Name</th>
+                  <th data-col="actionable" class="py-3 px-3">Actionable</th>
+                  <th data-col="level_1" class="py-3 px-3">L1</th>
+                  <th data-col="level_2" class="py-3 px-3">L2</th>
+                  <th data-col="level_3" class="py-3 px-3">L3</th>
+                  <th class="py-3 px-3">Regulation Para</th>
+                </tr>
+              </thead>
+              <tbody id="resultsBody" class="border-top-0"></tbody>
+            </table>
+          </div>
+
+          <!-- Full paragraph viewer -->
+          <div class="card border-0 shadow-sm p-4 rounded-4 mb-4" id="paraViewerCard" style="display:none;">
+            <h5 class="fw-bold text-navy mb-3">🔍 Full Paragraph Viewer</h5>
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              <span id="viewerMeta" class="text-secondary small fw-medium"></span>
+            </div>
+            <div class="p-3 bg-light rounded-3 overflow-auto" id="viewerText"
+              style="max-height:220px; font-size: 0.85rem; line-height: 1.6;"></div>
+          </div>
+
+          <hr class="my-5 text-secondary opacity-25">
+
+          <!-- Download section -->
+          <div class="card border-0 shadow-sm p-4 rounded-4 mb-4">
+            <h5 class="fw-bold text-navy mb-4">📥 Download Excel Report</h5>
+            <div class="row g-3 mb-4">
+              <div class="col-md-4">
+                <label for="exportCircularName" class="form-label text-secondary small fw-bold mb-1">Circular
+                  Name</label>
+                <input type="text" id="exportCircularName" class="form-control" placeholder="e.g. Master Direction" />
+              </div>
+              <div class="col-md-4">
+                <label for="exportAuthId" class="form-label text-secondary small fw-bold mb-1">Authority Document ID
+                  (Optional)</label>
+                <input type="text" id="exportAuthId" class="form-control" placeholder="e.g. RBI/2024-25/123" />
+              </div>
+              <div class="col-md-4">
+                <label for="exportEffDate" class="form-label text-secondary small fw-bold mb-1">Document Effective Date
+                  (Optional)</label>
+                <input type="text" id="exportEffDate" class="form-control" placeholder="e.g. 01/04/2024" />
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-3 flex-wrap mb-4">
+              <button class="btn btn-success btn-lg rounded-pill px-4 shadow-sm d-flex align-items-center gap-2"
+                id="downloadBtn">
+                <span id="downloadBtnText">📥 Download Excel</span>
+                <span id="downloadSpinner" class="spinner-border spinner-border-sm" style="display:none;"
+                  role="status"></span>
+              </button>
+              <button class="btn btn-warning btn-lg rounded-pill px-4 shadow-sm" id="submitForReviewBtn"
+                style="display:none;">
+                📨 Submit for Review
+              </button>
+              <div class="text-secondary small fw-medium" id="downloadInfo"></div>
+            </div>
+            <div class="alert alert-success d-flex align-items-center py-2 border-0 rounded-3 small m-0">
+              <span class="fs-5 me-2">✅</span>
+              <span>Excel features: Styled header · Auto-filter · Freeze pane · Conditional Yes/No formatting ·
+                Auto-width columns</span>
+            </div>
+          </div>
+
+        </div><!-- /exportContent -->
+      </div><!-- /container -->
+    </main>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="/js/bootstrap.bundle.min.js"></script>
+
+  <script src="/js/app.js?v=2"></script>
+  <script src="/js/export.js?v=2"></script>
+</body>
+
+</html>

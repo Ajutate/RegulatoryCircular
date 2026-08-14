@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Regulatory Circular Analyzer - My Documents</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="bg-body-tertiary">
+<div class="d-flex min-vh-100 flex-column flex-md-row">
+
+  <!-- Sidebar -->
+  <aside class="sidebar offcanvas-md offcanvas-start" tabindex="-1" id="sidebar">
+    <div class="offcanvas-header d-md-none">
+      <h5 class="offcanvas-title text-white">Menu</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#sidebar"></button>
+    </div>
+    <div class="offcanvas-body flex-column p-0">
+      <div class="sidebar-brand">
+        <div class="logo">📋</div>
+        <h1>Regulatory Circular<br>Analyzer</h1>
+      </div>
+      <nav class="sidebar-nav" id="sidebarNav"></nav>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main flex-grow-1">
+    <div class="d-md-none d-flex justify-content-between align-items-center p-3 bg-white border-bottom shadow-sm">
+      <div class="fw-bold fs-5"><span class="me-2">📁</span> My Documents</div>
+      <button class="btn btn-light border" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">☰</button>
+    </div>
+
+    <div class="container-fluid p-3 p-md-4 p-xl-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold text-navy mb-1">My Documents</h2>
+          <p class="text-secondary mb-0">View your drafts, track review status, and download final Excel reports.</p>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="historyTable">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-4">Date / Time</th>
+                  <th>Document Name</th>
+                  <th>Circular / Auth ID</th>
+                  <th>Paragraphs</th>
+                  <th>Status</th>
+                  <th class="text-end pe-4">Action</th>
+                </tr>
+              </thead>
+              <tbody id="historyBody">
+                <tr>
+                  <td colspan="5" class="text-center py-5 text-secondary">
+                    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                    Loading history...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app.js?v=2"></script>
+<script src="/js/history.js?v=2"></script>
+</body>
+</html>

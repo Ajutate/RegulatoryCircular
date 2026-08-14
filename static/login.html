@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — Regulatory Circular Analyzer</title>
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css"/>
+  <style>
+    .login-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--navy-900), var(--navy-700));
+    }
+    .login-card {
+      background: white;
+      border-radius: 1.5rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+      max-width: 440px;
+      width: 100%;
+      padding: 3rem 2.5rem;
+    }
+  </style>
+</head>
+<body>
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="text-center mb-4">
+      <div style="font-size:3rem;">📋</div>
+      <h2 class="fw-bold text-navy mt-2">Regulatory Circular Analyzer</h2>
+      <p class="text-secondary">Please sign in to continue</p>
+    </div>
+
+    <div class="mb-4">
+      <label class="form-label fw-semibold text-navy">Username</label>
+      <input type="text" id="loginUsername" class="form-control form-control-lg rounded-pill" placeholder="Enter your name" autofocus>
+    </div>
+
+    <div class="mb-4">
+      <label class="form-label fw-semibold text-navy">Password</label>
+      <input type="password" id="loginPassword" class="form-control form-control-lg rounded-pill" placeholder="Enter password">
+    </div>
+
+    <div id="loginError" class="alert alert-danger rounded-pill text-center py-2" style="display:none;"></div>
+
+    <div class="text-center mt-2">
+      <button id="loginBtn" class="btn btn-primary btn-lg rounded-pill px-5 text-center" disabled>
+        Login
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/login.js"></script>
+</body>
+</html>

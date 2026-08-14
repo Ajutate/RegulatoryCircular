@@ -1,0 +1,87 @@
+# ============================================================
+# LiteLLM Proxy Configuration — Ollama Integration
+# ============================================================
+# Start this proxy with:  litellm --config litellm_config.yaml
+# Then run the app:       python -m uvicorn server:app --port 8000
+#
+# Pre-requisites:
+#   1. Ollama running:       ollama serve
+#   2. Model pulled:         ollama pull llama3.1
+#   3. LiteLLM installed:    pip install litellm[proxy]
+# ============================================================
+
+model_list:
+  # ── Llama 3.1 (recommended for regulatory text + JSON) ──
+  - model_name: ollama/llama3.1
+    litellm_params:
+      model: ollama/llama3.1:8b
+      api_base: http://localhost:11434   # Ollama's default port
+
+  # ── Qwen 2.5 7B (fastest, excellent structured JSON output) ──
+  - model_name: ollama/qwen2.5:7b
+    litellm_params:
+      model: ollama/qwen2.5:7b
+      api_base: http://localhost:11434
+
+  # ── Mistral (solid for financial/legal text) ──
+  - model_name: ollama/mistral
+    litellm_params:
+      model: ollama/mistral
+      api_base: http://localhost:11434
+
+  # ── Gemma 2 9B ──
+  - model_name: ollama/gemma2:9b
+    litellm_params:
+      model: ollama/gemma2:9b
+      api_base: http://localhost:11434
+
+  # ── Llama 3.2 3B (lightweight, lower RAM) ──
+  - model_name: ollama/llama3.2
+    litellm_params:
+      model: ollama/llama3.2
+      api_base: http://localhost:11434
+
+# ── Proxy server settings ──
+litellm_settings:
+  # Force JSON mode on all requests (helps structured output with Ollama)
+  set_verbose: false
+  json_logs: false
+  # Increase timeout for large local models
+  request_timeout: 600
+
+general_settings:
+  master_key: sk-dummy-key   # Must match LITELLM_API_KEY in .env
+  port: 4000
+
+# ======================================================================
+# FUTURE MIGRATION: Gemini Flash 2.5
+# ======================================================================
+# When ready to switch from Ollama to Gemini:
+#
+#   Step 1 — Get a Google AI Studio API key:
+#            https://aistudio.google.com/app/apikey
+#
+#   Step 2 — Add the GOOGLE_API_KEY env var (or set it here):
+#            set GOOGLE_API_KEY=your-google-api-key
+#
+#   Step 3 — Add this block to model_list above (uncomment):
+#
+# model_list:
+#   - model_name: gemini/gemini-2.5-flash
+#     litellm_params:
+#       model: gemini/gemini-2.5-flash
+#       api_key: "os.environ/GOOGLE_API_KEY"   # reads from env var
+#
+#   Step 4 — Update .env:
+#            LLM_MODEL=gemini/gemini-2.5-flash
+#
+#   Step 5 — Restart litellm and uvicorn. That's it — zero code changes.
+#
+# Notes on Gemini Flash 2.5 vs Ollama:
+#   + Native structured output / tool-calling — the JSON fallback parser
+#     in regulatory_analyzer.py will still work but won't be needed.
+#   + Much faster and higher quality for long regulatory documents.
+#   + Supports very large context windows (1M tokens).
+#   - Requires internet connectivity and a Google Cloud billing account.
+# ======================================================================
+

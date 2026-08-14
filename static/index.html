@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Regulatory Circular Analyzer</title>
+  <meta name="description"
+    content="GenAI-powered regulatory circular analysis — classify every paragraph by business unit, theme, and control taxonomy, then export to Excel." />
+  <!-- Bootstrap 5 CSS -->
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body class="bg-body-tertiary">
+  <div class="d-flex min-vh-100 flex-column flex-md-row">
+
+    <!-- Sidebar -->
+    <aside class="sidebar offcanvas-md offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+      <div class="offcanvas-header d-md-none">
+        <h5 class="offcanvas-title text-white" id="sidebarLabel">Menu</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#sidebar"
+          aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body flex-column p-0">
+        <div class="sidebar-brand">
+          <div class="logo">📋</div>
+          <h1>Regulatory Circular<br>Analyzer</h1>
+          <!-- <p>Powered by GenAI · LangChain · LiteLLM</p> -->
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav"></nav>
+        <div class="sidebar-status mt-auto p-3">
+          <h4 class="text-uppercase text-secondary" style="font-size:0.75rem; letter-spacing:1px; margin-bottom:1rem;">
+            Status</h4>
+          <div class="d-flex align-items-center mb-2">
+            <div class="status-dot me-2" id="statusDoc"></div><span class="text-white" style="font-size:0.9rem;">Document uploaded</span>
+          </div>
+          <div class="d-flex align-items-center">
+            <div class="status-dot me-2" id="statusAna"></div><span class="text-white" style="font-size:0.9rem;">Analysis complete</span>
+          </div>
+          <div class="mt-2 text-secondary" id="statusCount" style="display:none;font-size:.75rem;"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main flex-grow-1">
+      <!-- Mobile top bar -->
+      <div class="d-md-none d-flex justify-content-between align-items-center p-3 bg-white border-bottom shadow-sm">
+        <div class="fw-bold fs-5"><span class="me-2">📋</span>Regulatory Analyzer</div>
+        <button class="btn btn-light border" type="button" data-bs-toggle="offcanvas"
+          data-bs-target="#sidebar">☰</button>
+      </div>
+
+      <div class="container-fluid p-3 p-md-4 p-xl-5">
+
+        <!-- Hero -->
+        <div class="card border-0 shadow-sm text-center p-4 p-md-5 mb-4 rounded-4"
+          style="background: linear-gradient(135deg, var(--navy-900), var(--navy-700)); color: white;">
+          <div class="display-3 mb-3">📋</div>
+          <h1 class="fw-bold mb-3">Regulatory Circular Analyzer</h1>
+          <p class="lead text-white-50 mx-auto" style="max-width: 700px;">
+            Upload a regulatory document, let AI classify every paragraph by business unit, theme, and control taxonomy
+            — then download the results as a formatted Excel report.
+          </p>
+          <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
+            <a href="upload.html" class="btn btn-primary btn-lg px-4 rounded-pill">🚀 Get Started</a>
+            <a href="#how-it-works" class="btn btn-outline-light btn-lg px-4 rounded-pill">Learn More</a>
+          </div>
+        </div>
+
+        <!-- Workflow cards -->
+        <div id="how-it-works" class="row g-4 mb-5">
+          <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-4 rounded-4">
+              <div class="fs-1 mb-3">📤</div>
+              <h3 class="h5 fw-bold text-navy">1 — Upload</h3>
+              <p class="text-secondary small flex-grow-1">Drag and drop a PDF or DOCX regulatory circular. The parser
+                extracts text and splits it into meaningful paragraphs.</p>
+              <div class="mt-3"><a href="upload.html" class="btn btn-outline-primary btn-sm rounded-pill">Start ↗</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-4 rounded-4">
+              <div class="fs-1 mb-3">🤖</div>
+              <h3 class="h5 fw-bold text-navy">2 — Analyze</h3>
+              <p class="text-secondary small flex-grow-1">Each paragraph is sent to the LLM. It classifies para type,
+                business unit, theme, control object, and three taxonomy levels.</p>
+              <div class="mt-3"><a href="analyze.html" class="btn btn-outline-primary btn-sm rounded-pill">Analyze ↗</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-4 rounded-4">
+              <div class="fs-1 mb-3">📊</div>
+              <h3 class="h5 fw-bold text-navy">3 — Export</h3>
+              <p class="text-secondary small flex-grow-1">Review results in an interactive filterable table, explore
+                charts by business unit and theme, and download the Excel report.</p>
+              <div class="mt-3"><a href="export.html" class="btn btn-outline-primary btn-sm rounded-pill">Export ↗</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+      </div><!-- /container -->
+    </main>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/app.js?v=2"></script>
+</body>
+
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checker — Review Queue</title>
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="bg-body-tertiary">
+<div class="d-flex min-vh-100 flex-column flex-md-row">
+
+  <!-- Sidebar -->
+  <aside class="sidebar offcanvas-md offcanvas-start" tabindex="-1" id="sidebar">
+    <div class="offcanvas-header d-md-none">
+      <h5 class="offcanvas-title text-white">Menu</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#sidebar"></button>
+    </div>
+    <div class="offcanvas-body flex-column p-0">
+      <div class="sidebar-brand">
+        <div class="logo">📋</div>
+        <h1>Regulatory Circular<br>Analyzer</h1>
+      </div>
+      <nav class="sidebar-nav" id="sidebarNav"></nav>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main flex-grow-1">
+    <div class="d-md-none d-flex justify-content-between align-items-center p-3 bg-white border-bottom shadow-sm">
+      <div class="fw-bold fs-5"><span class="me-2">✅</span>Checker — Review</div>
+      <button class="btn btn-light border" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">☰</button>
+    </div>
+
+    <div class="container-fluid p-3 p-md-4 p-xl-5" id="queueSection">
+      <div class="mb-4">
+        <h2 class="fw-bold text-navy mb-1">✅ Review Queue</h2>
+        <p class="text-secondary mb-0">Documents submitted by Makers awaiting your review.</p>
+      </div>
+
+      <div class="mb-4 mt-5">
+        <h4 class="fw-bold text-navy mb-1">Unassigned Review Pool</h4>
+        <p class="text-secondary mb-0">Documents waiting to be claimed by a checker.</p>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-4">Submitted</th>
+                  <th>Document Name</th>
+                  <th>Maker</th>
+                  <th>Paragraphs</th>
+                  <th class="text-end pe-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="unassignedBody">
+                <tr>
+                  <td colspan="5" class="text-center py-5 text-secondary">
+                    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                    Loading unassigned queue...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h4 class="fw-bold text-navy mb-1">My Assigned Documents</h4>
+        <p class="text-secondary mb-0">Documents you have claimed for review.</p>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-4">Submitted</th>
+                  <th>Document Name</th>
+                  <th>Maker</th>
+                  <th>Paragraphs</th>
+                  <th class="text-end pe-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="myQueueBody">
+                <tr>
+                  <td colspan="5" class="text-center py-5 text-secondary">
+                    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                    Loading my queue...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Checker Detailed Review View (Hidden by default) -->
+    <div id="reviewDetailSection" class="container-fluid p-3 p-md-4 p-xl-5" style="display: none;">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold text-navy mb-1">🔍 Review Document</h2>
+          <p class="text-secondary mb-0" id="reviewDocTitle">Reviewing document</p>
+        </div>
+        <div>
+           <button class="btn btn-outline-secondary rounded-pill me-2" id="backToQueueBtn">⬅️ Back to Queue</button>
+           <button class="btn btn-danger rounded-pill shadow-sm px-4 me-2" id="btnDetailReject">❌ Reject</button>
+           <button class="btn btn-success rounded-pill shadow-sm px-4" id="btnDetailApprove">✅ Final Approval</button>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="table-responsive" style="max-height: 60vh;">
+          <table class="table table-hover align-middle mb-0" id="checkerReviewTable">
+            <thead class="table-light sticky-top">
+              <tr>
+                <th class="ps-4">#</th>
+                <th>Regulation Para Preview</th>
+                <th>Type</th>
+                <th>Business Unit</th>
+                <th>Theme</th>
+                <th>Status</th>
+                <th class="text-end pe-4" style="min-width:300px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="checkerReviewBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Modal (Shared for Checker) -->
+    <div class="modal fade" id="editModal" tabindex="-1">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-4">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold text-navy">✏️ Edit Analysis</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="p-3 bg-light rounded-3 mb-3 small" id="editParaText" style="max-height:150px; overflow-y:auto;"></div>
+            
+            <input type="hidden" id="editIdx" />
+            
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Paragraph Type</label>
+                <select id="editParaType" class="form-select form-select-sm">
+                  <option value="Action Para">Action Para</option>
+                  <option value="Information Para">Information Para</option>
+                  <option value="Future Effective">Future Effective</option>
+                  <option value="Product or Service Not Offered">Product or Service Not Offered</option>
+                  <option value="One-Time Action">One-Time Action</option>
+                  <option value="Event Based">Event Based</option>
+                  <option value="Repealed">Repealed</option>
+                  <option value="Subsumed">Subsumed</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Business Unit</label>
+                <input type="text" id="editBU" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Theme</label>
+                <input type="text" id="editTheme" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Is Regulation Para Effective Date Provided</label>
+                <select id="editHasDate" class="form-select form-select-sm">
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Regulation para Effective Date</label>
+                <input type="text" id="editDate" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Control Objective Name</label>
+                <input type="text" id="editControl" class="form-control form-control-sm" />
+              </div>
+              <div class="col-12">
+                <label class="form-label small fw-bold">Actionable</label>
+                <textarea id="editActionable" class="form-control form-control-sm" rows="3"></textarea>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-bold">Level 1</label>
+                <input type="text" id="editL1" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-bold">Level 2</label>
+                <input type="text" id="editL2" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-bold">Level 3</label>
+                <input type="text" id="editL3" class="form-control form-control-sm" />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-0 pt-0">
+            <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary rounded-pill px-4" id="saveEditBtn">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reject Modal -->
+    <div class="modal fade" id="rejectModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold text-navy">❌ Reject Document</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <label class="form-label fw-semibold">Rejection Reason</label>
+            <textarea id="rejectComment" class="form-control" rows="4" placeholder="Explain why this document is being rejected..."></textarea>
+          </div>
+          <div class="modal-footer border-0 pt-0">
+            <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger rounded-pill px-4" id="confirmRejectBtn">Reject</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reanalyze Modal -->
+    <div class="modal fade" id="reanalyzeModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold text-navy">🔄 Re-analyzing...</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-center py-4">
+            <div class="progress mb-3" style="height: 8px;">
+              <div id="reanalyzeProgress" class="progress-bar bg-primary" style="width: 0%"></div>
+            </div>
+            <p class="text-secondary mb-0" id="reanalyzeStatus">Starting analysis...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app.js?v=2"></script>
+<script src="/js/checker.js?v=2"></script>
+</body>
+</html>
