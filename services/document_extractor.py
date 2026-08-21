@@ -117,17 +117,34 @@ class DocumentExtractor:
 
     @staticmethod
     def _extract_pdf(file_bytes: bytes) -> str:
-        """Extract text from all pages of a PDF, falling back to OCR if scanned."""
+        """Extract text from all pages of a PDF, falling back to OCR if scanned.
+        
+        Uses PyMuPDF's dict-based extraction to get individual text lines,
+        ensuring every bullet point and new visual line is treated as a
+        separate paragraph.
+        """
         text_parts: list[str] = []
         with fitz.open(stream=file_bytes, filetype="pdf") as doc:
             for page in doc:
-                blocks = page.get_text("blocks")
-                page_text = ""
-                if blocks:
-                    # type 0 is text (as opposed to image blocks)
-                    block_texts = [b[4].strip() for b in blocks if b[6] == 0]
-                    # Join blocks with double newlines to ensure ParagraphSplitter sees them as separate
-                    page_text = "\n\n".join(b for b in block_texts if b)
+                page_dict = page.get_text("dict", flags=fitz.TEXT_PRESERVE_WHITESPACE)
+                lines: list[str] = []
+                
+                if page_dict and "blocks" in page_dict:
+                    for block in page_dict["blocks"]:
+                        # Skip image blocks
+                        if block.get("type") != 0:
+                            continue
+                        for line_info in block.get("lines", []):
+                            # Concatenate all spans in a line
+                            line_text = "".join(
+                                span.get("text", "") for span in line_info.get("spans", [])
+                            ).strip()
+                            if line_text:
+                                lines.append(line_text)
+                        # Insert an extra blank line between blocks for visual separation
+                        lines.append("")
+                
+                page_text = "\n".join(lines).strip()
                 
                 # If no text found, try OCR
                 if not page_text:

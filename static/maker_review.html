@@ -9,6 +9,70 @@
   <style>
     .row-approved { background-color: #d1e7dd !important; }
     .row-rejected { background-color: #f8d7da !important; }
+
+    /* Drag-and-drop styles */
+    .drag-handle {
+      cursor: grab;
+      user-select: none;
+      font-size: 1.1rem;
+      opacity: 0.4;
+      transition: opacity 0.15s;
+    }
+    .drag-handle:hover { opacity: 1; }
+    tr.dragging {
+      opacity: 0.4;
+      background: #e3e8ff !important;
+    }
+    tr.drag-over {
+      border-top: 3px solid var(--primary) !important;
+    }
+
+    /* Merge checkbox */
+    .merge-check { width: 1.15em; height: 1.15em; cursor: pointer; }
+
+    /* Toolbar */
+    .para-toolbar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .para-toolbar .btn { font-size: 0.85rem; }
+
+    /* Split preview */
+    .split-preview {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      cursor: text;
+      white-space: pre-wrap;
+      word-break: break-word;
+      padding: 1rem;
+      border: 1px solid #dee2e6;
+      border-radius: 0.75rem;
+      background: #f8f9fa;
+      max-height: 350px;
+      overflow-y: auto;
+    }
+    .split-preview .split-marker {
+      display: block;
+      border-top: 3px dashed #dc3545;
+      margin: 0.5rem 0;
+      position: relative;
+    }
+    .split-preview .split-marker::after {
+      content: '✂️ Split here';
+      position: absolute;
+      top: -0.7rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      padding: 0 0.5rem;
+      font-size: 0.75rem;
+      color: #dc3545;
+      font-weight: 600;
+    }
+    .split-part-a { background: #d1e7dd; padding: 2px 0; border-radius: 4px; }
+    .split-part-b { background: #cfe2ff; padding: 2px 0; border-radius: 4px; }
   </style>
 </head>
 <body class="bg-body-tertiary">
@@ -61,19 +125,33 @@
             </div>
           </div>
 
+          <!-- Paragraph Management Toolbar -->
+          <div class="card border-0 shadow-sm rounded-4 mb-3 p-3">
+            <div class="para-toolbar">
+              <button class="btn btn-outline-primary rounded-pill" id="mergeBtn" disabled>
+                🔗 Merge Selected (<span id="mergeCount">0</span>)
+              </button>
+              <span class="text-muted small ms-2" id="mergeHint">Select 2+ paragraphs using checkboxes to merge them.</span>
+            </div>
+          </div>
+
           <!-- Review Table -->
           <div class="card border-0 shadow-sm rounded-4 mb-4">
             <div class="table-responsive" style="max-height: 60vh;">
               <table class="table table-hover align-middle mb-0" id="reviewTable">
                 <thead class="table-light sticky-top">
                   <tr>
-                    <th class="ps-4">#</th>
+                    <th style="width:30px;">
+                      <input type="checkbox" class="form-check-input merge-check" id="selectAllCheck" title="Select all">
+                    </th>
+                    <th style="width:30px;"></th>
+                    <th class="ps-2">#</th>
                     <th>Regulation Para Preview</th>
                     <th>Type</th>
                     <th>Business Unit</th>
                     <th>Theme</th>
                     <th>Status</th>
-                    <th class="text-end pe-4" style="min-width:300px;">Actions</th>
+                    <th class="text-end pe-4" style="min-width:340px;">Actions</th>
                   </tr>
                 </thead>
                 <tbody id="reviewBody"></tbody>
@@ -159,11 +237,40 @@
         </div>
       </div>
 
+      <!-- Split Modal -->
+      <div class="modal fade" id="splitModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content rounded-4">
+            <div class="modal-header border-0 pb-0">
+              <h5 class="modal-title fw-bold text-navy">✂️ Split Paragraph</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <p class="text-secondary small mb-2">Click at the point where you want to split this paragraph into two parts.</p>
+              <div id="splitPreview" class="split-preview"></div>
+              <input type="hidden" id="splitIdx" />
+              <input type="hidden" id="splitPos" />
+              <div class="mt-3 d-flex gap-2 align-items-center" id="splitInfo" style="display:none !important;">
+                <span class="badge bg-success-subtle text-success">Part A</span>
+                <span class="text-muted small" id="splitPartALen">0 chars</span>
+                <span class="mx-2">|</span>
+                <span class="badge bg-primary-subtle text-primary">Part B</span>
+                <span class="text-muted small" id="splitPartBLen">0 chars</span>
+              </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+              <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-danger rounded-pill px-4" id="confirmSplitBtn" disabled>✂️ Split & Re-analyze</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 
   <script src="/js/bootstrap.bundle.min.js"></script>
   <script src="/js/app.js?v=2"></script>
-  <script src="/js/maker_review.js?v=2"></script>
+  <script src="/js/maker_review.js?v=3"></script>
 </body>
 </html>

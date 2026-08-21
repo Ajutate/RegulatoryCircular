@@ -43,11 +43,10 @@ from services.database import (
     get_db_prompt, save_prompt, delete_prompt, get_all_prompts,
     submit_for_review, get_checker_queue, claim_document,
     approve_document, reject_document, update_document_excel,
-    get_unassigned_count, update_paragraph_result, update_document_results
+    get_unassigned_count, update_paragraph_result, update_document_results,
+    merge_paragraphs, split_paragraph, reorder_paragraphs
 )
-from passlib.context import CryptContext
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+import bcrypt
 from core.schemas import RegulatoryParagraphAnalysis
 from core.prompts import get_default_system_prompt, get_default_user_prompt_template
 from config.settings import get_settings, KNOWN_OLLAMA_MODELS
@@ -112,10 +111,16 @@ async def login(body: dict):
 
     user = get_user_by_username(username)
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid username or password.")
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    
+    # Verify using native bcrypt (handles passlib's legacy hashes perfectly)
+    try:
+        is_valid = bcrypt.checkpw(password.encode('utf-8'), user["password_hash"].encode('utf-8'))
+    except Exception:
+        is_valid = False
         
-    if not pwd_context.verify(password, user["password_hash"]):
-        raise HTTPException(status_code=401, detail="Invalid username or password.")
+    if not is_valid:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
 
     # Remove password hash before returning
     del user["password_hash"]
@@ -546,6 +551,86 @@ async def regenerate_paragraph(doc_id: str, idx: int):
     except Exception as e:
         logger.error(f"Regeneration failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# ------------------------------------------------------------------ #
+#  Paragraph Merge / Split / Reorder                                  #
+# ------------------------------------------------------------------ #
+
+@app.post("/api/document/{doc_id}/paragraphs/merge")
+async def api_merge_paragraphs(doc_id: str, body: dict):
+    """Merge 2+ paragraphs into one, then re-analyze the merged text via LLM."""
+    indices = body.get("indices", [])
+    if len(indices) < 2:
+        raise HTTPException(status_code=400, detail="At least 2 paragraph indices required.")
+
+    result = merge_paragraphs(doc_id, indices)
+    if not result:
+        raise HTTPException(status_code=400, detail="Merge failed. Check paragraph indices.")
+
+    merged_text = result["paragraph_text"]
+    new_idx = result["paragraph_index"]
+
+    # Re-analyze the merged paragraph via LLM
+    analyzer = RegulatoryAnalyzer()
+    try:
+        doc = get_document(doc_id)
+        total = doc["paragraph_count"] if doc else 1
+        analysis = await asyncio.get_event_loop().run_in_executor(
+            None, analyzer.analyze_paragraph, merged_text, new_idx + 1, total
+        )
+        analysis_dict = analysis.model_dump()
+        update_paragraph_result(doc_id, new_idx, analysis_dict)
+    except Exception as e:
+        logger.error(f"LLM re-analysis after merge failed: {e}")
+        # Merge succeeded in DB even if LLM fails; the row exists with Pending status
+
+    # Return full updated results
+    return await get_document_results(doc_id)
+
+
+@app.post("/api/document/{doc_id}/paragraphs/split")
+async def api_split_paragraph(doc_id: str, body: dict):
+    """Split a paragraph into two at a character position, then re-analyze both via LLM."""
+    idx = body.get("index")
+    split_pos = body.get("split_position")
+    if idx is None or split_pos is None:
+        raise HTTPException(status_code=400, detail="index and split_position are required.")
+
+    parts = split_paragraph(doc_id, int(idx), int(split_pos))
+    if not parts:
+        raise HTTPException(status_code=400, detail="Split failed. Check index and position.")
+
+    # Re-analyze both new paragraphs via LLM
+    analyzer = RegulatoryAnalyzer()
+    doc = get_document(doc_id)
+    total = doc["paragraph_count"] if doc else 1
+    for part in parts:
+        try:
+            analysis = await asyncio.get_event_loop().run_in_executor(
+                None, analyzer.analyze_paragraph,
+                part["paragraph_text"], part["paragraph_index"] + 1, total
+            )
+            analysis_dict = analysis.model_dump()
+            update_paragraph_result(doc_id, part["paragraph_index"], analysis_dict)
+        except Exception as e:
+            logger.error(f"LLM re-analysis after split failed for index {part['paragraph_index']}: {e}")
+
+    return await get_document_results(doc_id)
+
+
+@app.post("/api/document/{doc_id}/paragraphs/reorder")
+async def api_reorder_paragraphs(doc_id: str, body: dict):
+    """Reorder paragraphs (no LLM call needed)."""
+    new_order = body.get("new_order", [])
+    if not new_order:
+        raise HTTPException(status_code=400, detail="new_order is required.")
+
+    ok = reorder_paragraphs(doc_id, new_order)
+    if not ok:
+        raise HTTPException(status_code=400, detail="Reorder failed. Check new_order values.")
+
+    return await get_document_results(doc_id)
+
 
 @app.post("/api/maker/submit/{doc_id}")
 async def maker_submit(doc_id: str, body: dict):

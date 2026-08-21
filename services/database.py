@@ -112,17 +112,29 @@ def init_db():
     init_sample_users()
 
 def init_sample_users():
-    from passlib.context import CryptContext
-    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    import bcrypt
     
     db = SessionLocal()
     try:
-        for role in ["admin", "maker", "checker"]:
-            user = db.query(User).filter(User.username == role).first()
+        # Base roles
+        default_users = [
+            ("admin", "admin"),
+            ("maker", "maker"),
+            ("maker2", "maker"),
+            ("maker3", "maker"),
+            ("checker", "checker"),
+            ("checker2", "checker"),
+            ("checker3", "checker"),
+        ]
+        
+        for username, role in default_users:
+            user = db.query(User).filter(User.username == username).first()
             if not user:
                 try:
-                    hashed_pw = pwd_context.hash(role)
-                    new_user = User(username=role, password_hash=hashed_pw, role=role)
+                    # Password is the same as the username for simplicity in testing
+                    salt = bcrypt.gensalt()
+                    hashed_pw = bcrypt.hashpw(username.encode('utf-8'), salt).decode('utf-8')
+                    new_user = User(username=username, password_hash=hashed_pw, role=role)
                     db.add(new_user)
                     db.commit()
                 except IntegrityError:
@@ -552,12 +564,194 @@ def update_document_results(doc_id: str, analysis_results: List[Dict[str, Any]])
             db.delete(p)
             
         for idx, result in enumerate(analysis_results):
-            # Assumes paragraphs_json logic is obsolete for reanalysis (text wasn't changing)
-            # Actually we can't delete paragraphs if we don't know the text!
-            # It's better to update existing.
             pass
             
-        return False # Let's handle this differently if we need it
+        return False
     finally:
         db.close()
 
+
+# ------------------------------------------------------------------ #
+#  Paragraph Merge / Split / Reorder helpers                          #
+# ------------------------------------------------------------------ #
+
+def _reindex_paragraphs(db, doc_id: str) -> None:
+    """Reassign paragraph_index values 0, 1, 2, ... in order."""
+    paras = (
+        db.query(Paragraph)
+        .filter(Paragraph.document_id == doc_id)
+        .order_by(Paragraph.paragraph_index)
+        .all()
+    )
+    for new_idx, para in enumerate(paras):
+        para.paragraph_index = new_idx
+
+    # Update document paragraph count
+    doc = db.query(DocumentHistory).filter(DocumentHistory.id == doc_id).first()
+    if doc:
+        doc.paragraph_count = len(paras)
+
+
+def merge_paragraphs(doc_id: str, indices: List[int]) -> Optional[Dict[str, Any]]:
+    """
+    Merge 2+ paragraphs into one.
+
+    - Concatenates text in index order.
+    - Deletes old rows, inserts one new row at the lowest index.
+    - Reindexes all paragraphs.
+    - Returns the new paragraph dict (text only, no analysis yet).
+    """
+    if len(indices) < 2:
+        return None
+
+    indices_sorted = sorted(indices)
+    db = SessionLocal()
+    try:
+        paras = (
+            db.query(Paragraph)
+            .filter(Paragraph.document_id == doc_id, Paragraph.paragraph_index.in_(indices_sorted))
+            .order_by(Paragraph.paragraph_index)
+            .all()
+        )
+        if len(paras) != len(indices_sorted):
+            return None
+
+        # Build merged text
+        merged_text = " ".join(p.paragraph_text for p in paras)
+        new_index = indices_sorted[0]
+
+        # Delete old paragraphs
+        for p in paras:
+            db.delete(p)
+        db.flush()
+
+        # Insert merged paragraph
+        new_para = Paragraph(
+            document_id=doc_id,
+            paragraph_index=new_index,
+            paragraph_text=merged_text,
+            status="Pending",
+        )
+        db.add(new_para)
+        db.flush()
+
+        # Reindex
+        _reindex_paragraphs(db, doc_id)
+        db.commit()
+
+        return {
+            "paragraph_id": new_para.id,
+            "paragraph_index": new_para.paragraph_index,
+            "paragraph_text": merged_text,
+        }
+    except Exception:
+        db.rollback()
+        return None
+    finally:
+        db.close()
+
+
+def split_paragraph(doc_id: str, idx: int, split_pos: int) -> Optional[List[Dict[str, Any]]]:
+    """
+    Split one paragraph into two at character position `split_pos`.
+
+    - Deletes the old row, inserts two new rows.
+    - Reindexes all paragraphs.
+    - Returns a list of two dicts with the new paragraph texts.
+    """
+    db = SessionLocal()
+    try:
+        para = (
+            db.query(Paragraph)
+            .filter(Paragraph.document_id == doc_id, Paragraph.paragraph_index == idx)
+            .first()
+        )
+        if not para:
+            return None
+
+        text = para.paragraph_text
+        if split_pos <= 0 or split_pos >= len(text):
+            return None
+
+        part_a = text[:split_pos].strip()
+        part_b = text[split_pos:].strip()
+
+        if not part_a or not part_b:
+            return None
+
+        old_index = para.paragraph_index
+        db.delete(para)
+        db.flush()
+
+        # Insert two new paragraphs at the old index and old_index+1
+        para_a = Paragraph(
+            document_id=doc_id,
+            paragraph_index=old_index,
+            paragraph_text=part_a,
+            status="Pending",
+        )
+        para_b = Paragraph(
+            document_id=doc_id,
+            paragraph_index=old_index + 1,
+            paragraph_text=part_b,
+            status="Pending",
+        )
+        db.add(para_a)
+        db.add(para_b)
+        db.flush()
+
+        _reindex_paragraphs(db, doc_id)
+        db.commit()
+
+        return [
+            {"paragraph_id": para_a.id, "paragraph_index": para_a.paragraph_index, "paragraph_text": part_a},
+            {"paragraph_id": para_b.id, "paragraph_index": para_b.paragraph_index, "paragraph_text": part_b},
+        ]
+    except Exception:
+        db.rollback()
+        return None
+    finally:
+        db.close()
+
+
+def reorder_paragraphs(doc_id: str, new_order: List[int]) -> bool:
+    """
+    Reorder paragraphs according to `new_order`.
+
+    `new_order` is a list of current paragraph_index values in the desired
+    new sequence.  E.g. [2, 0, 1, 3] means "paragraph currently at index 2
+    should become the first one."
+    """
+    db = SessionLocal()
+    try:
+        paras = (
+            db.query(Paragraph)
+            .filter(Paragraph.document_id == doc_id)
+            .order_by(Paragraph.paragraph_index)
+            .all()
+        )
+
+        if len(new_order) != len(paras):
+            return False
+
+        # Build a map: old_index -> Paragraph object
+        para_map = {p.paragraph_index: p for p in paras}
+
+        # Use temporary negative indices to avoid unique-constraint clashes
+        for tmp_idx, old_idx in enumerate(new_order):
+            if old_idx not in para_map:
+                return False
+            para_map[old_idx].paragraph_index = -(tmp_idx + 1)
+        db.flush()
+
+        # Now set to the actual new indices
+        for tmp_idx, old_idx in enumerate(new_order):
+            para_map[old_idx].paragraph_index = tmp_idx
+        db.commit()
+
+        return True
+    except Exception:
+        db.rollback()
+        return False
+    finally:
+        db.close()

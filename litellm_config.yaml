@@ -44,7 +44,7 @@ model_list:
 # ── Proxy server settings ──
 litellm_settings:
   # Force JSON mode on all requests (helps structured output with Ollama)
-  set_verbose: false
+  set_verbose: true
   json_logs: false
   # Increase timeout for large local models
   request_timeout: 600

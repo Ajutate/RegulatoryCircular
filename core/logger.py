@@ -38,6 +38,10 @@ def setup_logging():
     # Suppress annoying passlib/bcrypt __about__ warning
     logging.getLogger("passlib").setLevel(logging.ERROR)
     
+    # Enable detailed HTTP API logging for OpenAI / LangChain
+    logging.getLogger("openai").setLevel(logging.DEBUG)
+    logging.getLogger("httpx").setLevel(logging.DEBUG)
+    
     # Prevent adding handlers multiple times if this is called more than once
     if not root_logger.handlers:
         root_logger.addHandler(file_handler)
