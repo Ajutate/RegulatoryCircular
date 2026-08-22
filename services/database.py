@@ -15,9 +15,10 @@ from typing import List, Dict, Any, Optional
 
 from sqlalchemy import (
     create_engine, Column, String, Integer, DateTime,
-    LargeBinary, Text, ForeignKey, Enum as SAEnum
+    LargeBinary, Text, ForeignKey, Enum as SAEnum, Boolean
 )
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import text
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
 from config.settings import get_settings
@@ -98,6 +99,7 @@ class Paragraph(Base):
     level_3 = Column(String, nullable=True)
     
     status = Column(String, default="Pending") # Pending, Approved, Rejected
+    needs_regeneration = Column(Boolean, default=False)
 
     document = relationship("DocumentHistory", back_populates="paragraphs")
 
@@ -109,6 +111,13 @@ class Paragraph(Base):
 
 def init_db():
     Base.metadata.create_all(bind=engine)
+    # Safe migration: add needs_regeneration column if it doesn't exist yet
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("ALTER TABLE paragraphs ADD COLUMN needs_regeneration BOOLEAN DEFAULT 0"))
+            conn.commit()
+    except Exception:
+        pass  # Column already exists
     init_sample_users()
 
 def init_sample_users():
@@ -372,7 +381,8 @@ def get_document(doc_id: str) -> Optional[Dict[str, Any]]:
                 "level_1": p.level_1,
                 "level_2": p.level_2,
                 "level_3": p.level_3,
-                "status": p.status
+                "status": p.status,
+                "needs_regeneration": bool(p.needs_regeneration)
             })
             
         return {
@@ -546,6 +556,7 @@ def update_paragraph_result(doc_id: str, idx: int, result_json: dict) -> bool:
         if "level_2" in result_json: para.level_2 = result_json["level_2"]
         if "level_3" in result_json: para.level_3 = result_json["level_3"]
         if "status" in result_json: para.status = result_json["status"]
+        if "needs_regeneration" in result_json: para.needs_regeneration = result_json["needs_regeneration"]
 
         db.commit()
         return True
@@ -631,6 +642,7 @@ def merge_paragraphs(doc_id: str, indices: List[int]) -> Optional[Dict[str, Any]
             paragraph_index=new_index,
             paragraph_text=merged_text,
             status="Pending",
+            needs_regeneration=True,
         )
         db.add(new_para)
         db.flush()
@@ -651,13 +663,13 @@ def merge_paragraphs(doc_id: str, indices: List[int]) -> Optional[Dict[str, Any]
         db.close()
 
 
-def split_paragraph(doc_id: str, idx: int, split_pos: int) -> Optional[List[Dict[str, Any]]]:
+def split_paragraph(doc_id: str, idx: int, new_parts: List[str]) -> Optional[List[Dict[str, Any]]]:
     """
-    Split one paragraph into two at character position `split_pos`.
+    Split one paragraph into multiple parts.
 
-    - Deletes the old row, inserts two new rows.
+    - Deletes the old row, inserts new rows for each part.
     - Reindexes all paragraphs.
-    - Returns a list of two dicts with the new paragraph texts.
+    - Returns a list of dicts with the new paragraph texts.
     """
     db = SessionLocal()
     try:
@@ -669,43 +681,37 @@ def split_paragraph(doc_id: str, idx: int, split_pos: int) -> Optional[List[Dict
         if not para:
             return None
 
-        text = para.paragraph_text
-        if split_pos <= 0 or split_pos >= len(text):
-            return None
-
-        part_a = text[:split_pos].strip()
-        part_b = text[split_pos:].strip()
-
-        if not part_a or not part_b:
+        if len(new_parts) < 1:
             return None
 
         old_index = para.paragraph_index
         db.delete(para)
         db.flush()
 
-        # Insert two new paragraphs at the old index and old_index+1
-        para_a = Paragraph(
-            document_id=doc_id,
-            paragraph_index=old_index,
-            paragraph_text=part_a,
-            status="Pending",
-        )
-        para_b = Paragraph(
-            document_id=doc_id,
-            paragraph_index=old_index + 1,
-            paragraph_text=part_b,
-            status="Pending",
-        )
-        db.add(para_a)
-        db.add(para_b)
+        # Insert new paragraphs starting at the old index
+        new_paras = []
+        for i, part in enumerate(new_parts):
+            new_para = Paragraph(
+                document_id=doc_id,
+                paragraph_index=old_index + i,
+                paragraph_text=part,
+                status="Pending",
+                needs_regeneration=True,
+            )
+            db.add(new_para)
+            new_paras.append(new_para)
+            
         db.flush()
-
         _reindex_paragraphs(db, doc_id)
         db.commit()
 
         return [
-            {"paragraph_id": para_a.id, "paragraph_index": para_a.paragraph_index, "paragraph_text": part_a},
-            {"paragraph_id": para_b.id, "paragraph_index": para_b.paragraph_index, "paragraph_text": part_b},
+            {
+                "paragraph_id": p.id,
+                "paragraph_index": p.paragraph_index,
+                "paragraph_text": p.paragraph_text,
+            }
+            for p in new_paras
         ]
     except Exception:
         db.rollback()

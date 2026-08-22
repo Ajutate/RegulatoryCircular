@@ -665,3 +665,28 @@ canvas { max-width: 100%; }
   to   { background: transparent; }
 }
 .row-new { animation: rowHighlight 2s ease; }
+
+/* -- Drag & Drop Table Highlights -- */
+tbody tr.merge-drop-target td {
+  background-color: rgba(46, 134, 193, 0.15) !important;
+  border-top: 2px dashed var(--blue-400);
+  border-bottom: 2px dashed var(--blue-400);
+}
+tbody tr.merge-drop-target td:first-child {
+  border-left: 2px dashed var(--blue-400);
+}
+tbody tr.merge-drop-target td:last-child {
+  border-right: 2px dashed var(--blue-400);
+}
+
+tbody tr.reorder-above td {
+  border-top: 3px solid var(--green) !important;
+}
+
+tbody tr.reorder-below td {
+  border-bottom: 3px solid var(--green) !important;
+}
+
+tbody tr.dragging {
+  opacity: 0.5;
+}

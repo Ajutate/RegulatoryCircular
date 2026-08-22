@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     app_name: str = "Regulatory Circular Analyzer"
     app_version: str = "1.0.0"
 
+    # OCR Config
+    tesseract_path: str | None = None
+
     # Database
     database_url: str = "sqlite:///./data/history.db"
 

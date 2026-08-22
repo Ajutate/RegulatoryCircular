@@ -3,13 +3,11 @@ Paragraph Splitter
 ===================
 Splits raw extracted text into meaningful regulatory paragraphs.
 
-Strategy:
-  - Each visual line from the PDF extractor is already on its own line.
-  - Lines that start with a bullet marker (•, -, *, ▪, ►, ●, numbered lists)
-    are always treated as a new paragraph.
-  - Lines separated by blank lines (double newlines) are separate paragraphs.
-  - Consecutive "plain" lines (no bullet, no blank line between them) are
-    merged together as they are likely continuation of the same paragraph.
+Strategy (using Docling Markdown):
+  - Docling exports clean Markdown.
+  - Paragraphs are separated by double newlines (\n\n).
+  - List items (bullets/numbers) might be separated by single newlines.
+  - We will treat each list item and each blank-line-separated block as a separate paragraph.
   - Noise (page numbers, standalone "Confidential", etc.) is filtered out.
 """
 
@@ -20,24 +18,11 @@ class ParagraphSplitter:
     """
     Split raw document text into a list of meaningful paragraphs.
 
-    Each bullet point and each block separated by blank lines becomes
-    its own paragraph.
+    Takes advantage of Markdown formatting provided by Docling.
     """
 
     # Minimum character length to consider a block a valid paragraph
     MIN_PARAGRAPH_LENGTH = 15
-
-    # Pattern to detect lines that start a new paragraph (bullet points, numbered items)
-    BULLET_PATTERN = re.compile(
-        r"^\s*("
-        r"[\u2022\u2023\u25E6\u2043\u2219\u25AA\u25AB\u25B8\u25B6\u25BA\u25CF\u25CB\u2013\u2014]"  # Unicode bullets/dashes
-        r"|[-*•▪►●◦‣⁃]"          # Common ASCII/symbol bullets
-        r"|\d+[.)]\s"              # Numbered list: 1. or 1) followed by space
-        r"|[a-zA-Z][.)]\s"        # Lettered list: a. or a) followed by space
-        r"|\([a-zA-Z0-9]+\)\s"   # Parenthesized list: (a) or (1) followed by space
-        r"|[ivxlIVXL]+[.)]\s"    # Roman numeral list: i. or iv) followed by space
-        r")"
-    )
 
     # Patterns for content that should be filtered out
     NOISE_PATTERNS = [
@@ -46,16 +31,20 @@ class ParagraphSplitter:
         re.compile(r"^\s*\d+\s*$"),
         re.compile(r"^\s*confidential\s*$", re.IGNORECASE),
         re.compile(r"^\s*draft\s*$", re.IGNORECASE),
+        re.compile(r"^#.*$"),  # Markdown headers (# Header) might be noise if they are just titles
     ]
+    
+    # Markdown list items start with -, *, +, or digits followed by a dot
+    LIST_PATTERN = re.compile(r"^\s*([-*+]|\d+\.)\s+")
 
     def split(self, text: str) -> list[str]:
         """
-        Split raw text into a list of cleaned paragraphs.
+        Split Markdown text into a list of cleaned paragraphs.
 
         Parameters
         ----------
         text : str
-            The full extracted text of the document.
+            The full extracted text of the document (Markdown formatted).
 
         Returns
         -------
@@ -85,8 +74,18 @@ class ParagraphSplitter:
                     current_para_lines = []
                 continue
 
-            # Bullet/numbered line → flush previous paragraph, start new one
-            if self.BULLET_PATTERN.match(stripped):
+            # Markdown List Item → flush previous paragraph, start new one
+            if self.LIST_PATTERN.match(line): # using original line to preserve indent logic if needed, but stripped works too
+                if current_para_lines:
+                    paragraphs.append(" ".join(current_para_lines))
+                    current_para_lines = []
+                # Remove the markdown bullet point syntax for cleaner review text, or keep it?
+                # Usually it's good to keep it so the user sees it's a list item.
+                current_para_lines.append(stripped)
+                continue
+                
+            # Markdown header
+            if line.startswith("#"):
                 if current_para_lines:
                     paragraphs.append(" ".join(current_para_lines))
                     current_para_lines = []
@@ -100,7 +99,7 @@ class ParagraphSplitter:
         if current_para_lines:
             paragraphs.append(" ".join(current_para_lines))
 
-        # Step 4: Filter noise (page numbers, headers, footers)
+        # Step 4: Filter noise (page numbers, headers, footers, table of contents)
         filtered = [p for p in paragraphs if not self._is_noise(p)]
 
         # Step 5: Final filter — remove anything still too short
@@ -128,5 +127,24 @@ class ParagraphSplitter:
     # ------------------------------------------------------------------ #
 
     def _is_noise(self, block: str) -> bool:
-        """Check if a block matches known noise patterns."""
-        return any(pattern.match(block) for pattern in self.NOISE_PATTERNS)
+        """Check if a block matches known noise patterns or is purely structural."""
+        if any(pattern.match(block) for pattern in self.NOISE_PATTERNS):
+            return True
+            
+        block_lower = block.lower()
+        
+        # Filter out table of contents blocks
+        if "table of contents" in block_lower and len(block) < 300:
+            return True
+            
+        # Filter out document headers that are just metadata (version, internal classification, etc.)
+        if ("version" in block_lower or "classification: internal" in block_lower) and len(block) < 300:
+            return True
+
+        # Drop Markdown tables if they are just structural (e.g., Docling outputs |---|---|)
+        if block.startswith("|") and block.endswith("|"):
+            # Simple check for markdown table separator row
+            if re.match(r"^\|[-\s\|]+\|$", block):
+                return True
+
+        return False

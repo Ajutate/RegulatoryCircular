@@ -512,6 +512,16 @@ async def get_document_results(doc_id: str):
 @app.put("/api/document/{doc_id}/paragraph/{idx}")
 async def edit_paragraph_result(doc_id: str, idx: int, body: dict):
     """Maker or Checker manually edits a single paragraph result."""
+    # Server-side guard: block Approve/Reject if paragraph needs regeneration
+    if body.get("status") in ("Approved", "Rejected"):
+        doc = get_document(doc_id)
+        if doc and doc.get("analysis_results_json"):
+            results = json.loads(doc["analysis_results_json"])
+            if 0 <= idx < len(results) and results[idx].get("needs_regeneration"):
+                raise HTTPException(
+                    status_code=400,
+                    detail="This paragraph was modified (merged/split). Please regenerate it before approving or rejecting."
+                )
     ok = update_paragraph_result(doc_id, idx, body)
     if not ok:
         raise HTTPException(status_code=400, detail="Failed to update paragraph.")
@@ -544,7 +554,8 @@ async def regenerate_paragraph(doc_id: str, idx: int):
         # Determine if it's skipped
         is_skipped = (result_dict.get("para_type") == "Information Para" and result_dict.get("actionable") == "Not Applicable")
         
-        # Update the database
+        # Update the database and clear needs_regeneration flag
+        result_dict["needs_regeneration"] = False
         update_paragraph_result(doc_id, idx, result_dict)
         
         return {"status": "ok", "result": result_dict, "skipped": is_skipped}
@@ -558,7 +569,7 @@ async def regenerate_paragraph(doc_id: str, idx: int):
 
 @app.post("/api/document/{doc_id}/paragraphs/merge")
 async def api_merge_paragraphs(doc_id: str, body: dict):
-    """Merge 2+ paragraphs into one, then re-analyze the merged text via LLM."""
+    """Merge 2+ paragraphs into one. Does NOT automatically run LLM analysis."""
     indices = body.get("indices", [])
     if len(indices) < 2:
         raise HTTPException(status_code=400, detail="At least 2 paragraph indices required.")
@@ -567,53 +578,21 @@ async def api_merge_paragraphs(doc_id: str, body: dict):
     if not result:
         raise HTTPException(status_code=400, detail="Merge failed. Check paragraph indices.")
 
-    merged_text = result["paragraph_text"]
-    new_idx = result["paragraph_index"]
-
-    # Re-analyze the merged paragraph via LLM
-    analyzer = RegulatoryAnalyzer()
-    try:
-        doc = get_document(doc_id)
-        total = doc["paragraph_count"] if doc else 1
-        analysis = await asyncio.get_event_loop().run_in_executor(
-            None, analyzer.analyze_paragraph, merged_text, new_idx + 1, total
-        )
-        analysis_dict = analysis.model_dump()
-        update_paragraph_result(doc_id, new_idx, analysis_dict)
-    except Exception as e:
-        logger.error(f"LLM re-analysis after merge failed: {e}")
-        # Merge succeeded in DB even if LLM fails; the row exists with Pending status
-
     # Return full updated results
     return await get_document_results(doc_id)
 
 
 @app.post("/api/document/{doc_id}/paragraphs/split")
 async def api_split_paragraph(doc_id: str, body: dict):
-    """Split a paragraph into two at a character position, then re-analyze both via LLM."""
+    """Split a paragraph into multiple parts. Does NOT automatically run LLM analysis."""
     idx = body.get("index")
-    split_pos = body.get("split_position")
-    if idx is None or split_pos is None:
-        raise HTTPException(status_code=400, detail="index and split_position are required.")
+    new_parts = body.get("new_parts")
+    if idx is None or not new_parts:
+        raise HTTPException(status_code=400, detail="index and new_parts are required.")
 
-    parts = split_paragraph(doc_id, int(idx), int(split_pos))
+    parts = split_paragraph(doc_id, int(idx), new_parts)
     if not parts:
-        raise HTTPException(status_code=400, detail="Split failed. Check index and position.")
-
-    # Re-analyze both new paragraphs via LLM
-    analyzer = RegulatoryAnalyzer()
-    doc = get_document(doc_id)
-    total = doc["paragraph_count"] if doc else 1
-    for part in parts:
-        try:
-            analysis = await asyncio.get_event_loop().run_in_executor(
-                None, analyzer.analyze_paragraph,
-                part["paragraph_text"], part["paragraph_index"] + 1, total
-            )
-            analysis_dict = analysis.model_dump()
-            update_paragraph_result(doc_id, part["paragraph_index"], analysis_dict)
-        except Exception as e:
-            logger.error(f"LLM re-analysis after split failed for index {part['paragraph_index']}: {e}")
+        raise HTTPException(status_code=400, detail="Split failed. Check index and parts.")
 
     return await get_document_results(doc_id)
 

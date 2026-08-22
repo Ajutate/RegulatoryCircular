@@ -18,18 +18,66 @@ The rest of the application only depends on the ``extract()`` and
 import io
 import os
 import sys
+import tempfile
 from typing import Any
 
-import fitz  # PyMuPDF
 from docx import Document as DocxDocument
-
-# Configure Tesseract path for Windows
-if sys.platform.startswith("win"):
-    tesseract_path = r"C:\Program Files\Tesseract-OCR"
-    if os.path.exists(tesseract_path):
-        os.environ["PATH"] += os.pathsep + tesseract_path
+# Configure Tesseract path across OSes
+def _configure_tesseract():
+    from dotenv import load_dotenv
+    load_dotenv()
+    
+    # 1. User-configured override from .env
+    env_tesseract = os.environ.get("TESSERACT_PATH")
+    if env_tesseract and os.path.exists(env_tesseract):
+        if env_tesseract not in os.environ.get("PATH", ""):
+            os.environ["PATH"] += os.pathsep + env_tesseract
         if "TESSDATA_PREFIX" not in os.environ:
-            os.environ["TESSDATA_PREFIX"] = os.path.join(tesseract_path, "tessdata")
+            tess_data = os.path.join(env_tesseract, "tessdata")
+            if os.path.exists(tess_data):
+                os.environ["TESSDATA_PREFIX"] = tess_data
+        
+        # Still apply HF fix for Windows if necessary
+        if sys.platform.startswith("win"):
+            os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+            os.environ["HF_HUB_DISABLE_IMPLICIT_TOKEN"] = "1"
+        return
+
+    # 2. Auto-discovery fallback
+    if sys.platform.startswith("win"):
+        # Windows
+        win_paths = [r"C:\Program Files\Tesseract-OCR", r"C:\Program Files (x86)\Tesseract-OCR"]
+        for p in win_paths:
+            if os.path.exists(p):
+                os.environ["PATH"] += os.pathsep + p
+                if "TESSDATA_PREFIX" not in os.environ:
+                    tess_data = os.path.join(p, "tessdata")
+                    if os.path.exists(tess_data):
+                        os.environ["TESSDATA_PREFIX"] = tess_data
+                break
+                
+        # Fix HuggingFace Hub symlink issue on Windows without Developer Mode
+        os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+        os.environ["HF_HUB_DISABLE_IMPLICIT_TOKEN"] = "1"
+    else:
+        # macOS / Linux
+        if "TESSDATA_PREFIX" not in os.environ:
+            unix_tessdata_paths = [
+                "/usr/share/tesseract-ocr/5/tessdata",
+                "/usr/share/tesseract-ocr/4.00/tessdata",
+                "/usr/share/tessdata",
+                "/opt/homebrew/share/tessdata",
+                "/usr/local/share/tessdata"
+            ]
+            for p in unix_tessdata_paths:
+                if os.path.exists(p):
+                    os.environ["TESSDATA_PREFIX"] = p
+                    break
+
+_configure_tesseract()
+
+# We import DocumentConverter from docling
+from docling.document_converter import DocumentConverter
 
 
 class DocumentExtractor:
@@ -41,7 +89,7 @@ class DocumentExtractor:
     the document bytes to ``extract()`` and receive the full text back.
 
     Supported formats:
-        - PDF  (.pdf)  — via PyMuPDF
+        - PDF  (.pdf)  — via IBM Docling
         - DOCX (.docx) — via python-docx
     """
 
@@ -63,7 +111,7 @@ class DocumentExtractor:
         Returns
         -------
         str
-            The extracted plain-text content of the document.
+            The extracted plain-text content of the document in Markdown format.
 
         Raises
         ------
@@ -112,91 +160,43 @@ class DocumentExtractor:
             )
 
     # ------------------------------------------------------------------ #
-    #  PDF extraction (PyMuPDF)                                           #
+    #  PDF extraction (IBM Docling)                                       #
     # ------------------------------------------------------------------ #
 
     @staticmethod
     def _extract_pdf(file_bytes: bytes) -> str:
-        """Extract text from all pages of a PDF, falling back to OCR if scanned.
-        
-        Uses PyMuPDF's dict-based extraction to get individual text lines,
-        ensuring every bullet point and new visual line is treated as a
-        separate paragraph.
         """
-        text_parts: list[str] = []
-        with fitz.open(stream=file_bytes, filetype="pdf") as doc:
-            for page in doc:
-                page_dict = page.get_text("dict", flags=fitz.TEXT_PRESERVE_WHITESPACE)
-                lines: list[str] = []
-                
-                if page_dict and "blocks" in page_dict:
-                    for block in page_dict["blocks"]:
-                        # Skip image blocks
-                        if block.get("type") != 0:
-                            continue
-                        for line_info in block.get("lines", []):
-                            # Concatenate all spans in a line
-                            line_text = "".join(
-                                span.get("text", "") for span in line_info.get("spans", [])
-                            ).strip()
-                            if line_text:
-                                lines.append(line_text)
-                        # Insert an extra blank line between blocks for visual separation
-                        lines.append("")
-                
-                page_text = "\n".join(lines).strip()
-                
-                # If no text found, try OCR
-                if not page_text:
-                    try:
-                        page_text = page.get_textpage_ocr(flags=0, language="eng", dpi=300).extractText().strip()
-                    except Exception as e:
-                        print(f"OCR failed for page: {e}")
+        Extract text from a PDF using IBM Docling.
+        Returns beautifully structured Markdown.
+        """
+        # Save to a temporary file since Docling's converter is safest with a physical file path
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp_file:
+            tmp_file.write(file_bytes)
+            tmp_path = tmp_file.name
 
-                if page_text:
-                    text_parts.append(page_text)
-        return "\n\n".join(text_parts)
+        try:
+            converter = DocumentConverter()
+            result = converter.convert(tmp_path)
+            # Export the structured document to Markdown
+            markdown_text = result.document.export_to_markdown()
+            return markdown_text
+        finally:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
 
     @staticmethod
     def _extract_pdf_with_metadata(file_bytes: bytes, file_name: str) -> dict[str, Any]:
-        """Extract text and metadata from a PDF."""
-        text_parts: list[str] = []
-        first_heading = ""
-
-        with fitz.open(stream=file_bytes, filetype="pdf") as doc:
-            page_count = len(doc)
-            pdf_metadata = doc.metadata or {}
-            for page in doc:
-                page_text = page.get_text("text").strip()
-                
-                # If no text found, try OCR
-                if not page_text:
-                    try:
-                        page_text = page.get_textpage_ocr(flags=0, language="eng", dpi=300).extractText().strip()
-                    except Exception as e:
-                        print(f"OCR failed for page: {e}")
-
-                if page_text:
-                    if not first_heading:
-                        # Grab the very first non-empty line as a fallback heading
-                        first_line = page_text.split("\n")[0].strip()
-                        if first_line:
-                            first_heading = first_line
-                    text_parts.append(page_text)
-
+        """Extract text and metadata from PDF using Docling."""
+        # For simplicity, we just return the text and basic metadata
+        text = DocumentExtractor._extract_pdf(file_bytes)
+        
         return {
-            "text": "\n\n".join(text_parts),
+            "text": text,
             "file_name": file_name,
-            "file_size_kb": round(len(file_bytes) / 1024, 1),
-            "page_count": page_count,
-            "format": "PDF",
-            "metadata": {
-                "title": pdf_metadata.get("title", ""),
-                "author": pdf_metadata.get("author", ""),
-                "subject": pdf_metadata.get("subject", ""),
-                "creator": pdf_metadata.get("creator", ""),
-                "first_heading": first_heading,
-            },
+            "file_size_kb": round(len(file_bytes) / 1024, 2),
+            "page_count": 0, # Docling doesn't give a simple page count out of the box in the markdown output
+            "format": "pdf",
+            "metadata": {"extracted_by": "docling"}
         }
 
     # ------------------------------------------------------------------ #
@@ -205,63 +205,34 @@ class DocumentExtractor:
 
     @staticmethod
     def _extract_docx(file_bytes: bytes) -> str:
-        """Extract text from all paragraphs and tables of a DOCX."""
+        """Extract text from all paragraphs of a DOCX file."""
         doc = DocxDocument(io.BytesIO(file_bytes))
-        parts: list[str] = []
-
-        # Extract paragraphs
-        for para in doc.paragraphs:
-            text = para.text.strip()
-            if text:
-                parts.append(text)
-
-        # Extract text from tables (row by row)
-        for table in doc.tables:
-            for row in table.rows:
-                row_text = " | ".join(cell.text.strip() for cell in row.cells if cell.text.strip())
-                if row_text:
-                    parts.append(row_text)
-
-        return "\n\n".join(parts)
+        # Keep empty paragraphs to preserve spacing (useful for chunking)
+        paragraphs = [para.text for para in doc.paragraphs]
+        return "\n".join(paragraphs)
 
     @staticmethod
     def _extract_docx_with_metadata(file_bytes: bytes, file_name: str) -> dict[str, Any]:
-        """Extract text and metadata from a DOCX."""
+        """Extract text and metadata from DOCX file."""
         doc = DocxDocument(io.BytesIO(file_bytes))
-        parts: list[str] = []
-        first_heading = ""
+        paragraphs = [para.text for para in doc.paragraphs]
+        text = "\n".join(paragraphs)
 
-        for para in doc.paragraphs:
-            text = para.text.strip()
-            if text:
-                # If it's a heading style, or just the very first text we see
-                is_heading_style = para.style and ("Heading" in para.style.name or "Title" in para.style.name)
-                if not first_heading and is_heading_style:
-                    first_heading = text
-                elif not first_heading and len(parts) == 0:
-                    first_heading = text
-                parts.append(text)
+        core_props = doc.core_properties
+        metadata = {
+            "author": core_props.author,
+            "created": core_props.created.isoformat() if core_props.created else None,
+            "modified": core_props.modified.isoformat() if core_props.modified else None,
+            "title": core_props.title,
+        }
 
-        for table in doc.tables:
-            for row in table.rows:
-                row_text = " | ".join(cell.text.strip() for cell in row.cells if cell.text.strip())
-                if row_text:
-                    parts.append(row_text)
-
-        core = doc.core_properties
         return {
-            "text": "\n\n".join(parts),
+            "text": text,
             "file_name": file_name,
-            "file_size_kb": round(len(file_bytes) / 1024, 1),
-            "page_count": len(doc.sections),  # approximate via sections
-            "format": "DOCX",
-            "metadata": {
-                "title": core.title or "",
-                "author": core.author or "",
-                "subject": core.subject or "",
-                "created": str(core.created) if core.created else "",
-                "first_heading": first_heading,
-            },
+            "file_size_kb": round(len(file_bytes) / 1024, 2),
+            "page_count": None,  # Not applicable for DOCX natively
+            "format": "docx",
+            "metadata": metadata,
         }
 
     # ------------------------------------------------------------------ #
@@ -270,7 +241,6 @@ class DocumentExtractor:
 
     @staticmethod
     def _get_extension(file_name: str) -> str:
-        """Return the lowercased file extension including the dot."""
-        if "." in file_name:
-            return "." + file_name.rsplit(".", 1)[-1].lower()
-        return ""
+        """Safely extract and lower-case the file extension."""
+        _, ext = os.path.splitext(file_name)
+        return ext.lower()
