@@ -44,7 +44,8 @@ from services.database import (
     submit_for_review, get_checker_queue, claim_document,
     approve_document, reject_document, update_document_excel,
     get_unassigned_count, update_paragraph_result, update_document_results,
-    merge_paragraphs, split_paragraph, reorder_paragraphs
+    merge_paragraphs, split_paragraph, reorder_paragraphs,
+    delete_paragraph
 )
 import bcrypt
 from core.schemas import RegulatoryParagraphAnalysis
@@ -527,6 +528,14 @@ async def edit_paragraph_result(doc_id: str, idx: int, body: dict):
         raise HTTPException(status_code=400, detail="Failed to update paragraph.")
     return {"status": "ok"}
 
+@app.delete("/api/document/{doc_id}/paragraph/{idx}")
+async def api_delete_paragraph(doc_id: str, idx: int):
+    """Delete a paragraph row so it won't appear in the exported Excel."""
+    ok = delete_paragraph(doc_id, idx)
+    if not ok:
+        raise HTTPException(status_code=400, detail="Delete failed. Check paragraph index.")
+    return await get_document_results(doc_id)
+
 @app.post("/api/document/{doc_id}/paragraph/{idx}/regenerate")
 async def regenerate_paragraph(doc_id: str, idx: int):
     """Regenerate analysis for a single paragraph via LLM."""
@@ -662,6 +671,20 @@ async def checker_approve(doc_id: str, body: dict):
         raise HTTPException(status_code=404, detail="Document or results not found.")
         
     raw_results = json.loads(doc["analysis_results_json"])
+    
+    # Check for unregenerated or invalid paragraphs before parsing
+    for idx, r in enumerate(raw_results):
+        if r.get("needs_regeneration"):
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Paragraph {idx + 1} was modified but not regenerated. Please click '🔄 Regen' before approving."
+            )
+        if not r.get("para_type"):
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Paragraph {idx + 1} is missing analysis data. Please edit it or click '🔄 Regen'."
+            )
+            
     try:
         results = [RegulatoryParagraphAnalysis(**r) for r in raw_results]
     except Exception as e:

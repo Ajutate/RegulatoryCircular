@@ -184,6 +184,7 @@ function renderCheckerReviewTable(results, paragraphs) {
           <button class="btn btn-sm btn-outline-danger rounded-pill btn-reject-row" data-idx="${idx}">❌</button>
           <button class="btn btn-sm btn-outline-primary rounded-pill btn-edit" data-idx="${idx}">✏️ Edit</button>
           <button class="btn btn-sm btn-outline-warning rounded-pill btn-regenerate" data-idx="${idx}">🔄 Regen</button>
+          <button class="btn btn-sm btn-outline-dark rounded-pill btn-delete-row" data-idx="${idx}" title="Delete this paragraph">🗑️</button>
         </div>
       </td>
     `;
@@ -202,6 +203,9 @@ function renderCheckerReviewTable(results, paragraphs) {
   });
   document.querySelectorAll('.btn-regenerate').forEach(btn => {
     btn.addEventListener('click', () => regenerateRow(btn.dataset.idx, btn));
+  });
+  document.querySelectorAll('.btn-delete-row').forEach(btn => {
+    btn.addEventListener('click', () => deleteRow(btn.dataset.idx));
   });
 }
 
@@ -275,9 +279,9 @@ document.getElementById('saveEditBtn')?.addEventListener('click', async () => {
     renderCheckerReviewTable(window.docData.results, window.docData.paragraphs);
     
     bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
-    showToast('Paragraph updated successfully', 'success');
+    await showAlertModal('Paragraph Updated', 'The paragraph was successfully updated.', 'success');
   } catch (e) {
-    showToast(e.message, 'error');
+    await showAlertModal('Error Updating Paragraph', e.message, 'error');
   } finally {
     btn.disabled = false;
     btn.textContent = 'Save Changes';
@@ -310,6 +314,31 @@ async function regenerateRow(idx, btn) {
   }
 }
 
+async function deleteRow(idx) {
+  const paraText = window.docData.results[idx]?.paragraph_text || '';
+  const preview = paraText.substring(0, 100) + (paraText.length > 100 ? '...' : '');
+  
+  const confirmed = await showConfirmModal('🗑️ Delete Paragraph', `Delete paragraph ${parseInt(idx) + 1}?\n\n"${preview}"\n\nThis paragraph will be removed and won't appear in the Excel export.`, 'Delete', 'danger');
+  if (!confirmed) return;
+
+  try {
+    const res = await fetch(`/api/document/${window.currentDocId}/paragraph/${idx}`, {
+      method: 'DELETE'
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Delete failed');
+    }
+
+    const data = await res.json();
+    window.docData = data;
+    renderCheckerReviewTable(data.results, data.paragraphs);
+    showToast('Paragraph deleted ✅', 'success');
+  } catch (e) {
+    showToast(e.message, 'error');
+  }
+}
+
 // Back to queue
 document.getElementById('backToQueueBtn')?.addEventListener('click', () => {
   document.getElementById('reviewDetailSection').style.display = 'none';
@@ -322,7 +351,8 @@ document.getElementById('btnDetailApprove')?.addEventListener('click', async () 
   const docId = window.currentDocId;
   const btn = document.getElementById('btnDetailApprove');
   
-  if (!confirm('This will generate the Excel file and approve the document. Proceed?')) return;
+  const confirmed = await showConfirmModal('✅ Final Approval', 'This will generate the Excel file and approve the document. Proceed?', 'Approve', 'success');
+  if (!confirmed) return;
   
   btn.disabled = true;
   btn.textContent = 'Approving...';
@@ -333,13 +363,16 @@ document.getElementById('btnDetailApprove')?.addEventListener('click', async () 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: user.id })
     });
-    if (!res.ok) throw new Error('Approval failed');
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Approval failed');
+    }
     
-    showToast('Document approved and Excel generated! ✅', 'success');
+    await showAlertModal('Success', 'Document approved and Excel generated!', 'success');
     document.getElementById('backToQueueBtn').click();
     await loadQueue();
   } catch (e) {
-    showToast(e.message, 'error');
+    await showAlertModal('Approval Failed', e.message, 'error');
   } finally {
     btn.disabled = false;
     btn.textContent = '✅ Final Approval';

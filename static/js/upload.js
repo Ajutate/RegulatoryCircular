@@ -156,6 +156,7 @@ function renderPreAnalysisTable() {
     tr.setAttribute('draggable', 'true');
     tr.innerHTML = `
       <td><span class="drag-handle" title="Drag onto another row to merge, or drag between rows to reorder">⠿</span></td>
+      <td><input class="form-check-input row-checkbox" type="checkbox" data-idx="${idx}"></td>
       <td class="fw-bold ps-2">${idx + 1}</td>
       <td style="font-size: 0.85rem; line-height: 1.5; white-space: pre-wrap;" title="${esc(text)}">${esc(text)}</td>
       <td class="text-end pe-4">
@@ -170,8 +171,9 @@ function renderPreAnalysisTable() {
 
   // Attach button events
   document.querySelectorAll('.btn-delete').forEach(btn => 
-    btn.addEventListener('click', () => {
-      if(confirm('Are you sure you want to remove this paragraph? It will be excluded from AI analysis.')){
+    btn.addEventListener('click', async () => {
+      const confirmed = await showConfirmModal('Remove Paragraph', 'Are you sure you want to remove this paragraph? It will be excluded from AI analysis.', 'Remove', 'danger');
+      if (confirmed) {
         deletePara(btn.dataset.idx);
       }
     })
@@ -179,6 +181,23 @@ function renderPreAnalysisTable() {
   document.querySelectorAll('.btn-split').forEach(btn => 
     btn.addEventListener('click', () => openSplitModal(btn.dataset.idx))
   );
+
+  // Handle select all and merge button visibility
+  const selectAll = document.getElementById('selectAllPreAnalysis');
+  if (selectAll) {
+    selectAll.checked = false;
+    selectAll.addEventListener('change', (e) => {
+      document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = e.target.checked);
+      toggleMergeBtn();
+    });
+  }
+  document.querySelectorAll('.row-checkbox').forEach(cb => cb.addEventListener('change', toggleMergeBtn));
+
+  function toggleMergeBtn() {
+    const checked = document.querySelectorAll('.row-checkbox:checked').length;
+    const btn = document.getElementById('mergeSelectedBtn');
+    if (btn) btn.style.display = checked > 1 ? 'inline-block' : 'none';
+  }
 
   if (!tbody.dataset.dndInitialized) {
     initPreAnalysisDragAndDrop();
@@ -374,4 +393,29 @@ document.getElementById('confirmSplitBtn')?.addEventListener('click', () => {
   } else {
     showToast('Paragraph updated.', 'success');
   }
+});
+
+document.getElementById('mergeSelectedBtn')?.addEventListener('click', async () => {
+  const checkedBoxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
+  if (checkedBoxes.length < 2) return;
+  
+  const indices = checkedBoxes.map(cb => parseInt(cb.dataset.idx)).sort((a, b) => a - b);
+  const confirmed = await showConfirmModal('🔗 Merge Paragraphs', `Merge ${indices.length} selected paragraphs together?`, 'Merge', 'primary');
+  if (!confirmed) return;
+
+  let paras = State.get(STATE_KEYS.PARAGRAPHS);
+  const firstIdx = indices[0];
+  const combinedText = indices.map(i => paras[i]).join('\n\n');
+  paras[firstIdx] = combinedText;
+  
+  for (let i = indices.length - 1; i > 0; i--) {
+    paras.splice(indices[i], 1);
+  }
+  
+  State.set(STATE_KEYS.PARAGRAPHS, paras);
+  renderPreAnalysisTable();
+  
+  const btn = document.getElementById('mergeSelectedBtn');
+  if (btn) btn.style.display = 'none';
+  showToast('Paragraphs merged successfully.', 'success');
 });

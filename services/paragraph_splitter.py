@@ -12,6 +12,7 @@ Strategy (using Docling Markdown):
 """
 
 import re
+import html
 
 
 class ParagraphSplitter:
@@ -31,7 +32,6 @@ class ParagraphSplitter:
         re.compile(r"^\s*\d+\s*$"),
         re.compile(r"^\s*confidential\s*$", re.IGNORECASE),
         re.compile(r"^\s*draft\s*$", re.IGNORECASE),
-        re.compile(r"^#.*$"),  # Markdown headers (# Header) might be noise if they are just titles
     ]
     
     # Markdown list items start with -, *, +, or digits followed by a dot
@@ -53,6 +53,9 @@ class ParagraphSplitter:
         """
         if not text or not text.strip():
             return []
+
+        # Step 0: Unescape HTML entities (e.g., &amp; -> &)
+        text = html.unescape(text)
 
         # Step 1: Normalise line endings
         text = text.replace("\r\n", "\n").replace("\r", "\n")
@@ -102,8 +105,8 @@ class ParagraphSplitter:
         # Step 4: Filter noise (page numbers, headers, footers, table of contents)
         filtered = [p for p in paragraphs if not self._is_noise(p)]
 
-        # Step 5: Final filter — remove anything still too short
-        result = [p for p in filtered if len(p) >= self.MIN_PARAGRAPH_LENGTH]
+        # Step 5: Final filter — remove anything still too short, but keep headers
+        result = [p for p in filtered if len(p) >= self.MIN_PARAGRAPH_LENGTH or p.startswith("#")]
 
         return result
 

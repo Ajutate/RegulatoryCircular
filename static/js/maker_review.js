@@ -84,6 +84,7 @@ function renderReviewTable(results, paragraphs) {
       <td>
         <span class="drag-handle" title="Drag onto another row to merge, or drag to reorder">⠿</span>
       </td>
+      <td><input class="form-check-input row-checkbox" type="checkbox" data-idx="${idx}"></td>
       <td class="fw-bold ps-2">${idx + 1}</td>
       <td style="font-size: 0.8rem; opacity: 0.8; max-width: 250px;" class="text-truncate" title="${esc(r.paragraph_text)}">
         ${esc(r.paragraph_text)}
@@ -126,6 +127,23 @@ function renderReviewTable(results, paragraphs) {
   if (!tbody.dataset.dndInitialized) {
     initDragAndDrop();
     tbody.dataset.dndInitialized = "true";
+  }
+
+  // Handle select all and merge button visibility
+  const selectAll = document.getElementById('selectAllMaker');
+  if (selectAll) {
+    selectAll.checked = false;
+    selectAll.addEventListener('change', (e) => {
+      document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = e.target.checked);
+      toggleMergeBtn();
+    });
+  }
+  document.querySelectorAll('.row-checkbox').forEach(cb => cb.addEventListener('change', toggleMergeBtn));
+
+  function toggleMergeBtn() {
+    const checked = document.querySelectorAll('.row-checkbox:checked').length;
+    const btn = document.getElementById('mergeSelectedBtn');
+    if (btn) btn.style.display = checked > 1 ? 'inline-block' : 'none';
   }
   
   checkSubmitState();
@@ -239,7 +257,8 @@ async function performMerge(fromIdx, toIdx) {
   const preview = `Paragraph ${fromIdx + 1}: "${fromText.substring(0, 80)}..."\n\n` +
                   `Paragraph ${toIdx + 1}: "${toText.substring(0, 80)}..."`;
 
-  if (!confirm(`🔗 Merge these 2 paragraphs?\n\n${preview}`)) return;
+  const confirmed = await showConfirmModal('🔗 Merge Paragraphs', `Merge these 2 paragraphs?\n\n${preview}`, 'Merge', 'primary');
+  if (!confirmed) return;
 
   // Show loading state
   showToast('Merging paragraphs...', 'info');
@@ -589,3 +608,40 @@ async function submitDocument() {
     btn.textContent = '📨 Submit to Checker';
   }
 }
+
+document.getElementById('mergeSelectedBtn')?.addEventListener('click', async () => {
+  const checkedBoxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
+  if (checkedBoxes.length < 2) return;
+  
+  const indices = checkedBoxes.map(cb => parseInt(cb.dataset.idx)).sort((a, b) => a - b);
+  const confirmed = await showConfirmModal('🔗 Merge Paragraphs', `Merge ${indices.length} selected paragraphs together?`, 'Merge', 'primary');
+  if (!confirmed) return;
+
+  showToast('Merging paragraphs...', 'info');
+  disableTable(true);
+
+  try {
+    const res = await fetch(`/api/document/${window.currentDocId}/paragraphs/merge`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ indices })
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Merge failed');
+    }
+
+    const data = await res.json();
+    window.docData = data;
+    document.getElementById('docParaCount').textContent = data.results.length;
+    renderReviewTable(data.results, data.paragraphs);
+    
+    const btn = document.getElementById('mergeSelectedBtn');
+    if (btn) btn.style.display = 'none';
+    showToast('Merge successful! Click Regenerate when ready.', 'success');
+  } catch (e) {
+    showToast(e.message, 'error');
+  } finally {
+    disableTable(false);
+  }
+});

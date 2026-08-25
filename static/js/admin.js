@@ -82,7 +82,8 @@ async function savePrompts() {
 }
 
 async function resetPrompts() {
-  if (!confirm('Reset both prompts to their code defaults? Any custom edits will be lost.')) return;
+  const confirmed = await showConfirmModal('Reset Prompts', 'Reset both prompts to their code defaults? Any custom edits will be lost.', 'Reset', 'danger');
+  if (!confirmed) return;
 
   try {
     await fetch('/api/admin/prompts/system', { method: 'DELETE' });

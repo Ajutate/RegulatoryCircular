@@ -100,6 +100,7 @@ class Paragraph(Base):
     
     status = Column(String, default="Pending") # Pending, Approved, Rejected
     needs_regeneration = Column(Boolean, default=False)
+    is_deleted = Column(Boolean, default=False)
 
     document = relationship("DocumentHistory", back_populates="paragraphs")
 
@@ -111,13 +112,17 @@ class Paragraph(Base):
 
 def init_db():
     Base.metadata.create_all(bind=engine)
-    # Safe migration: add needs_regeneration column if it doesn't exist yet
-    try:
-        with engine.connect() as conn:
-            conn.execute(text("ALTER TABLE paragraphs ADD COLUMN needs_regeneration BOOLEAN DEFAULT 0"))
-            conn.commit()
-    except Exception:
-        pass  # Column already exists
+    # Safe migrations: add new columns if they don't exist yet
+    for col_sql in [
+        "ALTER TABLE paragraphs ADD COLUMN needs_regeneration BOOLEAN DEFAULT 0",
+        "ALTER TABLE paragraphs ADD COLUMN is_deleted BOOLEAN DEFAULT 0",
+    ]:
+        try:
+            with engine.connect() as conn:
+                conn.execute(text(col_sql))
+                conn.commit()
+        except Exception:
+            pass  # Column already exists
     init_sample_users()
 
 def init_sample_users():
@@ -368,6 +373,8 @@ def get_document(doc_id: str) -> Optional[Dict[str, Any]]:
         paragraphs_data = []
         analysis_data = []
         for p in doc.paragraphs:
+            if p.is_deleted:
+                continue
             paragraphs_data.append(p.paragraph_text)
             analysis_data.append({
                 "paragraph_text": p.paragraph_text,
@@ -587,10 +594,10 @@ def update_document_results(doc_id: str, analysis_results: List[Dict[str, Any]])
 # ------------------------------------------------------------------ #
 
 def _reindex_paragraphs(db, doc_id: str) -> None:
-    """Reassign paragraph_index values 0, 1, 2, ... in order."""
+    """Reassign paragraph_index values 0, 1, 2, ... in order (skipping soft-deleted)."""
     paras = (
         db.query(Paragraph)
-        .filter(Paragraph.document_id == doc_id)
+        .filter(Paragraph.document_id == doc_id, Paragraph.is_deleted == False)
         .order_by(Paragraph.paragraph_index)
         .all()
     )
@@ -601,6 +608,38 @@ def _reindex_paragraphs(db, doc_id: str) -> None:
     doc = db.query(DocumentHistory).filter(DocumentHistory.id == doc_id).first()
     if doc:
         doc.paragraph_count = len(paras)
+
+
+def delete_paragraph(doc_id: str, idx: int) -> bool:
+    """
+    Soft-delete a single paragraph by index.
+
+    - Marks the paragraph as is_deleted=True.
+    - Reindexes remaining (non-deleted) paragraphs.
+    - Returns True on success.
+    """
+    db = SessionLocal()
+    try:
+        para = (
+            db.query(Paragraph)
+            .filter(Paragraph.document_id == doc_id, Paragraph.paragraph_index == idx)
+            .first()
+        )
+        if not para:
+            return False
+
+        para.is_deleted = True
+        db.flush()
+        _reindex_paragraphs(db, doc_id)
+        db.commit()
+        return True
+    except Exception:
+        db.rollback()
+        return False
+    finally:
+        db.close()
+
+
 
 
 def merge_paragraphs(doc_id: str, indices: List[int]) -> Optional[Dict[str, Any]]:

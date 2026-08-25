@@ -62,6 +62,93 @@ function showToast(msg, type = 'info', duration = 4000) {
   }, duration);
 }
 
+// ── Confirm Modal ────────────────────────────────
+function showConfirmModal(title, message, confirmText = 'Confirm', confirmStyle = 'danger') {
+  return new Promise((resolve) => {
+    const existing = document.getElementById('customConfirmModal');
+    if (existing) existing.remove();
+
+    const html = `
+      <div class="modal fade" id="customConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content rounded-4 shadow">
+            <div class="modal-header border-0 pb-0">
+              <h5 class="modal-title fw-bold text-navy">${esc(title)}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-secondary" style="white-space: pre-wrap;">${esc(message)}</div>
+            <div class="modal-footer border-0 pt-0">
+              <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-${confirmStyle} rounded-pill px-4" id="btnCustomConfirm">${esc(confirmText)}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', html);
+    const modalEl = document.getElementById('customConfirmModal');
+    const modalInst = new bootstrap.Modal(modalEl);
+    
+    let resolved = false;
+
+    document.getElementById('btnCustomConfirm').addEventListener('click', () => {
+      resolved = true;
+      resolve(true);
+      modalInst.hide();
+    });
+
+    modalEl.addEventListener('hidden.bs.modal', () => {
+      if (!resolved) resolve(false);
+      modalEl.remove();
+    });
+
+    modalInst.show();
+  });
+}
+
+// ── Alert Modal ──────────────────────────────────
+function showAlertModal(title, message, type = 'info') {
+  return new Promise((resolve) => {
+    const existing = document.getElementById('customAlertModal');
+    if (existing) existing.remove();
+
+    let icon = 'ℹ️';
+    let btnStyle = 'primary';
+    let titleStyle = 'text-navy';
+
+    if (type === 'success') { icon = '✅'; btnStyle = 'success'; titleStyle = 'text-success'; }
+    if (type === 'error')   { icon = '❌'; btnStyle = 'danger'; titleStyle = 'text-danger'; }
+    if (type === 'warning') { icon = '⚠️'; btnStyle = 'warning'; titleStyle = 'text-warning'; }
+
+    const html = `
+      <div class="modal fade" id="customAlertModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content rounded-4 shadow">
+            <div class="modal-header border-0 pb-0">
+              <h5 class="modal-title fw-bold ${titleStyle}">${icon} ${esc(title)}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-secondary" style="white-space: pre-wrap;">${esc(message)}</div>
+            <div class="modal-footer border-0 pt-0">
+              <button type="button" class="btn btn-${btnStyle} rounded-pill px-4" data-bs-dismiss="modal">OK</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', html);
+    const modalEl = document.getElementById('customAlertModal');
+    const modalInst = new bootstrap.Modal(modalEl);
+
+    modalEl.addEventListener('hidden.bs.modal', () => {
+      resolve();
+      modalEl.remove();
+    });
+
+    modalInst.show();
+  });
+}
+
 // ── Sidebar — role-based navigation ──────────────
 const NAV_ITEMS = {
   admin: [

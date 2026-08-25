@@ -157,6 +157,7 @@
           <!-- Paragraph Management Toolbar -->
           <div class="card border-0 shadow-sm rounded-4 mb-3 p-3">
             <div class="para-toolbar">
+              <button class="btn btn-sm btn-primary me-2" id="mergeSelectedBtn" style="display:none;">🔗 Merge Selected</button>
               <span class="badge bg-primary-subtle text-primary px-3 py-2">💡 Tip</span>
               <span class="text-muted small ms-1">
                 <strong>Drag</strong> a row onto another to <strong>merge</strong> them. 
@@ -173,6 +174,7 @@
                 <thead class="table-light sticky-top">
                   <tr>
                     <th style="width:35px;"></th>
+                    <th style="width:35px;"><input class="form-check-input" type="checkbox" id="selectAllMaker"></th>
                     <th class="ps-2" style="width:40px;">#</th>
                     <th>Regulation Para Preview</th>
                     <th>Type</th>

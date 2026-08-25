@@ -196,7 +196,7 @@ class DocumentExtractor:
             "file_size_kb": round(len(file_bytes) / 1024, 2),
             "page_count": 0, # Docling doesn't give a simple page count out of the box in the markdown output
             "format": "pdf",
-            "metadata": {"extracted_by": "docling"}
+            "metadata": {}
         }
 
     # ------------------------------------------------------------------ #
