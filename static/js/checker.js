@@ -28,7 +28,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       bootstrap.Modal.getInstance(document.getElementById('rejectModal')).hide();
       showToast('Document rejected.', 'warning');
-      await loadQueue();
+      setTimeout(() => {
+        window.location.href = 'history.html';
+      }, 1500);
     } catch (err) {
       showToast('Reject failed: ' + err.message, 'error');
     }
@@ -368,9 +370,10 @@ document.getElementById('btnDetailApprove')?.addEventListener('click', async () 
       throw new Error(err.detail || 'Approval failed');
     }
     
-    await showAlertModal('Success', 'Document approved and Excel generated!', 'success');
-    document.getElementById('backToQueueBtn').click();
-    await loadQueue();
+    showToast('Document approved and Excel generated!', 'success');
+    setTimeout(() => {
+      window.location.href = 'history.html';
+    }, 1500);
   } catch (e) {
     await showAlertModal('Approval Failed', e.message, 'error');
   } finally {
@@ -384,9 +387,5 @@ document.getElementById('btnDetailReject')?.addEventListener('click', () => {
   rejectDocId = window.currentDocId;
   document.getElementById('rejectComment').value = '';
   new bootstrap.Modal(document.getElementById('rejectModal')).show();
-  // when rejected, it automatically reloads queue. We can just switch view back
-  bootstrap.Modal.getInstance(document.getElementById('rejectModal'))._element.addEventListener('hidden.bs.modal', () => {
-     document.getElementById('backToQueueBtn').click();
-  }, {once: true});
 });
 

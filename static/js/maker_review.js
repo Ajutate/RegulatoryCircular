@@ -80,6 +80,11 @@ function renderReviewTable(results, paragraphs) {
     const approveDisabled = needsRegen ? 'disabled title="Regenerate first"' : '';
     const regenBadge = needsRegen ? ' <span class="badge bg-warning text-dark">⚠️ Needs Regen</span>' : '';
 
+    const isRegenerating = r.is_regenerating === true;
+    const regenBtnHtml = isRegenerating 
+      ? `<button class="btn btn-sm btn-outline-warning rounded-pill btn-regenerate" data-idx="${idx}" disabled><span class="spinner-border spinner-border-sm"></span></button>`
+      : `<button class="btn btn-sm btn-outline-warning rounded-pill btn-regenerate" data-idx="${idx}">🔄 Regen</button>`;
+
     tr.innerHTML = `
       <td>
         <span class="drag-handle" title="Drag onto another row to merge, or drag to reorder">⠿</span>
@@ -98,7 +103,7 @@ function renderReviewTable(results, paragraphs) {
           <button class="btn btn-sm btn-outline-success rounded-pill btn-approve-row" data-idx="${idx}" ${approveDisabled}>✅</button>
           <button class="btn btn-sm btn-outline-danger rounded-pill btn-reject-row" data-idx="${idx}" ${approveDisabled}>❌</button>
           <button class="btn btn-sm btn-outline-primary rounded-pill btn-edit" data-idx="${idx}">✏️ Edit</button>
-          <button class="btn btn-sm btn-outline-warning rounded-pill btn-regenerate" data-idx="${idx}">🔄 Regen</button>
+          ${regenBtnHtml}
           <button class="btn btn-sm btn-outline-info rounded-pill btn-split" data-idx="${idx}">✂️ Split</button>
         </div>
       </td>
@@ -498,7 +503,7 @@ async function updateRowStatus(idx, status) {
 function openEditModal(idx) {
   const result = window.docData.results[idx];
   document.getElementById('editIdx').value = idx;
-  document.getElementById('editParaText').textContent = result.paragraph_text;
+  document.getElementById('editParaText').value = result.paragraph_text;
   document.getElementById('editParaType').value = result.para_type || 'Action Para';
   document.getElementById('editBU').value = result.business_unit || '';
   document.getElementById('editTheme').value = result.theme || '';
@@ -517,6 +522,7 @@ async function saveEdit() {
   const btn = document.getElementById('saveEditBtn');
 
   const updatedData = {
+    paragraph_text: document.getElementById('editParaText').value,
     para_type: document.getElementById('editParaType').value,
     business_unit: document.getElementById('editBU').value,
     theme: document.getElementById('editTheme').value,
@@ -555,9 +561,8 @@ async function saveEdit() {
 }
 
 async function regenerateRow(idx, btn) {
-  btn.disabled = true;
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+  window.docData.results[idx].is_regenerating = true;
+  renderReviewTable(window.docData.results, window.docData.paragraphs);
 
   try {
     const res = await fetch(`/api/document/${window.currentDocId}/paragraph/${idx}/regenerate`, {
@@ -569,13 +574,12 @@ async function regenerateRow(idx, btn) {
     Object.assign(window.docData.results[idx], data.result);
     window.docData.results[idx].status = 'Pending';
     window.docData.results[idx].needs_regeneration = false;
-    renderReviewTable(window.docData.results, window.docData.paragraphs);
     showToast('Paragraph regenerated', 'success');
   } catch (e) {
     showToast(e.message, 'error');
   } finally {
-    btn.disabled = false;
-    btn.innerHTML = originalText;
+    window.docData.results[idx].is_regenerating = false;
+    renderReviewTable(window.docData.results, window.docData.paragraphs);
   }
 }
 

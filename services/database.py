@@ -552,6 +552,7 @@ def update_paragraph_result(doc_id: str, idx: int, result_json: dict) -> bool:
         if not para:
             return False
             
+        if "paragraph_text" in result_json: para.paragraph_text = result_json["paragraph_text"]
         if "para_type" in result_json: para.para_type = result_json["para_type"]
         if "business_unit" in result_json: para.business_unit = result_json["business_unit"]
         if "theme" in result_json: para.theme = result_json["theme"]

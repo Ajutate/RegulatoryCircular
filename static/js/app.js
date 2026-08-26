@@ -30,6 +30,22 @@ function requireAuth() {
     window.location.href = '/login.html';
     return null;
   }
+
+  const role = user.role || 'maker';
+  if (role === 'checker') {
+    const makerPages = ['upload.html', 'analyze.html', 'maker_review.html', 'export.html'];
+    if (makerPages.includes(page)) {
+      window.location.href = '/index.html';
+      return null;
+    }
+  } else if (role === 'maker') {
+    const checkerPages = ['checker.html'];
+    if (checkerPages.includes(page)) {
+      window.location.href = '/index.html';
+      return null;
+    }
+  }
+
   return user;
 }
 
@@ -247,6 +263,17 @@ function initSidebar() {
 
 // ── Sidebar status badges ────────────────────────
 function updateSidebarStatus() {
+  const user = getUser();
+  const statusContainer = document.getElementById('statusDoc')?.closest('.sidebar-status');
+  if (statusContainer) {
+    if (user && user.role === 'checker') {
+      statusContainer.style.display = 'none';
+      return;
+    } else {
+      statusContainer.style.display = '';
+    }
+  }
+
   const docMeta  = State.get(STATE_KEYS.DOC_META);
   const results  = State.get(STATE_KEYS.RESULTS);
 
@@ -359,7 +386,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // Auth guard (skip for login page)
   const page = window.location.pathname.split('/').pop() || 'index.html';
   if (page !== 'login.html') {
-    requireAuth();
+    const user = requireAuth();
+    if (user && user.role === 'checker' && (page === 'index.html' || page === '')) {
+      document.querySelectorAll('a[href="upload.html"], a[href="analyze.html"], a[href="export.html"], a[href="#how-it-works"]').forEach(el => {
+        el.remove(); // Physically remove from DOM so it doesn't show in Inspect Element
+      });
+      const howItWorks = document.getElementById('how-it-works');
+      if (howItWorks) howItWorks.remove();
+
+      const checkerWorkflow = document.getElementById('checker-workflow');
+      if (checkerWorkflow) checkerWorkflow.classList.remove('d-none');
+    }
   }
 
   initSidebar();

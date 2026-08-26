@@ -140,10 +140,6 @@ class ParagraphSplitter:
         if "table of contents" in block_lower and len(block) < 300:
             return True
             
-        # Filter out document headers that are just metadata (version, internal classification, etc.)
-        if ("version" in block_lower or "classification: internal" in block_lower) and len(block) < 300:
-            return True
-
         # Drop Markdown tables if they are just structural (e.g., Docling outputs |---|---|)
         if block.startswith("|") and block.endswith("|"):
             # Simple check for markdown table separator row

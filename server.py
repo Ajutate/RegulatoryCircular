@@ -290,6 +290,20 @@ async def run_analysis_job(session_id: str):
             })
 
         if store["status"] == "running":
+            # Apply document-level effective date logic
+            unique_dates = set()
+            for r in store["results"]:
+                d = r.get("effective_date")
+                if d and isinstance(d, str) and d.strip().lower() not in ("", "null", "none", "n/a"):
+                    unique_dates.add(d.strip())
+            
+            if len(unique_dates) == 1:
+                global_date = unique_dates.pop()
+                logger.info(f"Found exactly one unique effective date '{global_date}'. Applying to all paragraphs.")
+                for r in store["results"]:
+                    r["has_effective_date"] = "Yes"
+                    r["effective_date"] = global_date
+
             logger.info(f"Background analysis job {session_id} completed successfully")
             store["status"] = "complete"
 
@@ -727,7 +741,7 @@ async def checker_reject(doc_id: str, body: dict):
 
 
 @app.post("/api/checker/reanalyze/{doc_id}")
-async def checker_reanalyze(doc_id: str, body: dict):
+async def checker_reanalyze(doc_id: str, body: dict, background_tasks: BackgroundTasks):
     """
     Re-run analysis on stored paragraphs for a document.
     Returns a session_id for SSE streaming, and stores the doc_id for later update.
@@ -751,6 +765,7 @@ async def checker_reanalyze(doc_id: str, body: dict):
         "error": None,
         "doc_id": doc_id,  # track which document this re-analysis belongs to
     }
+    background_tasks.add_task(run_analysis_job, session_id)
     return {"session_id": session_id, "total": len(paragraphs), "doc_id": doc_id}
 
 
