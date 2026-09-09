@@ -49,7 +49,7 @@ async function loadQueue() {
     // Render Unassigned
     if (data.unassigned.length === 0) {
       unassignedBody.innerHTML = `
-        <tr><td colspan="5" class="text-center py-5 text-secondary">
+        <tr><td colspan="6" class="text-center py-5 text-secondary">
           No unassigned documents pending review.
         </td></tr>`;
     } else {
@@ -62,6 +62,7 @@ async function loadQueue() {
           <td class="fw-medium text-navy">${esc(doc.file_name)}</td>
           <td>${esc(doc.submitter_name || '—')}</td>
           <td><span class="badge bg-secondary-subtle text-secondary">${doc.paragraph_count}</span></td>
+          <td><span class="badge bg-warning text-dark rounded-pill">Pending Review</span></td>
           <td class="text-end pe-4">
             <div class="d-flex justify-content-end gap-1 flex-wrap">
               <button class="btn btn-sm btn-primary rounded-pill btn-claim" data-id="${doc.id}">✋ Claim</button>
@@ -75,7 +76,7 @@ async function loadQueue() {
     // Render My Queue
     if (data.my_queue.length === 0) {
       myQueueBody.innerHTML = `
-        <tr><td colspan="5" class="text-center py-5 text-secondary">
+        <tr><td colspan="6" class="text-center py-5 text-secondary">
           You have no claimed documents pending review.
         </td></tr>`;
     } else {
@@ -88,6 +89,7 @@ async function loadQueue() {
           <td class="fw-medium text-navy">${esc(doc.file_name)}</td>
           <td>${esc(doc.submitter_name || '—')}</td>
           <td><span class="badge bg-secondary-subtle text-secondary">${doc.paragraph_count}</span></td>
+          <td><span class="badge bg-warning text-dark rounded-pill">Pending Review</span></td>
           <td class="text-end pe-4">
             <div class="d-flex justify-content-end gap-1 flex-wrap">
               <button class="btn btn-sm btn-outline-primary rounded-pill btn-review-detail" data-id="${doc.id}" data-name="${esc(doc.file_name)}">📋 Review</button>

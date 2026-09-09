@@ -46,7 +46,7 @@ async function loadDocumentResults(docId) {
 
     document.getElementById('docTitle').textContent = data.file_name;
     document.getElementById('docParaCount').textContent = data.results.length;
-    document.getElementById('docStatus').textContent = data.status.toUpperCase();
+    document.getElementById('docStatus').textContent = data.status === 'pending_review' ? 'Pending Review' : data.status.toUpperCase();
 
     renderReviewTable(data.results, data.paragraphs);
 
@@ -105,6 +105,7 @@ function renderReviewTable(results, paragraphs) {
           <button class="btn btn-sm btn-outline-primary rounded-pill btn-edit" data-idx="${idx}">✏️ Edit</button>
           ${regenBtnHtml}
           <button class="btn btn-sm btn-outline-info rounded-pill btn-split" data-idx="${idx}">✂️ Split</button>
+          <button class="btn btn-sm btn-outline-danger rounded-pill btn-delete" data-idx="${idx}">🗑️ Delete</button>
         </div>
       </td>
     `;
@@ -126,6 +127,9 @@ function renderReviewTable(results, paragraphs) {
   );
   document.querySelectorAll('.btn-split').forEach(btn =>
     btn.addEventListener('click', () => openSplitModal(btn.dataset.idx))
+  );
+  document.querySelectorAll('.btn-delete').forEach(btn =>
+    btn.addEventListener('click', () => deleteRow(btn.dataset.idx))
   );
 
   // Initialize drag-and-drop (merge + reorder)
@@ -604,7 +608,7 @@ async function submitDocument() {
     if (!res.ok) throw new Error('Submit failed');
 
     showToast('Document submitted for Checker review! ✅', 'success');
-    document.getElementById('docStatus').textContent = 'PENDING_REVIEW';
+    document.getElementById('docStatus').textContent = 'Pending Review';
     setTimeout(() => { window.location.href = '/history.html'; }, 1500);
   } catch (e) {
     showToast(e.message, 'error');

@@ -175,7 +175,6 @@ const NAV_ITEMS = {
   maker: [
     { page: 'index.html',   icon: '🏠', label: 'Home' },
     { page: 'upload.html',  icon: '📤', label: 'Upload Document' },
-    { page: 'analyze.html', icon: '🔍', label: 'Analyze' },
     { page: 'history.html', icon: '📁', label: 'My Documents' },
   ],
   checker: [

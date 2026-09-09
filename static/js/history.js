@@ -32,9 +32,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       const statusBadge = getStatusBadge(doc.status);
       const isDraftOrRejected = doc.status === 'draft' || doc.status === 'rejected';
       const isApproved = doc.status === 'approved';
+      const isPendingAnalysis = doc.status === 'pending_analysis';
       
       const reviewBtnHtml = (isDraftOrRejected && user.role === 'maker')
         ? `<a href="/maker_review.html?doc_id=${doc.id}" class="btn btn-sm btn-outline-primary rounded-pill px-3 ms-2">📝 Review & Edit</a>`
+        : '';
+        
+      const analyzeBtnHtml = (isPendingAnalysis && user.role === 'maker')
+        ? `<a href="/analyze.html?doc_id=${doc.id}" class="btn btn-sm btn-outline-info rounded-pill px-3 ms-2">🔍 Analyze</a>`
         : '';
         
       const downloadBtnHtml = isApproved
@@ -50,6 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <td>${statusBadge}</td>
         <td class="text-end pe-4" style="max-width: none; overflow: visible; white-space: nowrap;">
           ${downloadBtnHtml}
+          ${analyzeBtnHtml}
           ${reviewBtnHtml}
         </td>
       `;
@@ -69,6 +75,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function getStatusBadge(status) {
   switch (status) {
+    case 'pending_analysis':
+      return '<span class="badge bg-info text-dark rounded-pill">📥 Extracted</span>';
     case 'pending_review':
       return '<span class="badge bg-warning text-dark rounded-pill">⏳ Pending Review</span>';
     case 'approved':

@@ -20,8 +20,31 @@ const maxSlider      = document.getElementById('maxSlider');
 const maxNum         = document.getElementById('maxNum');
 
 /* ── On load ── */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   loadModelConfig();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const docId = urlParams.get('doc_id');
+  if (docId) {
+    try {
+      const res = await fetch(`/api/document/${docId}/results`);
+      if (res.ok) {
+        const data = await res.json();
+        State.set(STATE_KEYS.DOC_META, { file_name: data.file_name, paragraph_count: data.paragraphs.length });
+        State.set(STATE_KEYS.PARAGRAPHS, data.paragraphs);
+        State.set('rca_is_from_analysis', true);
+        if (data.status !== 'pending_analysis' && data.results && data.results.length > 0) {
+            State.set(STATE_KEYS.RESULTS, data.results);
+        } else {
+            State.clear(STATE_KEYS.RESULTS);
+        }
+        window.currentDocId = docId;
+      }
+    } catch (e) {
+      console.error(e);
+      showToast('Failed to load document from server.', 'error');
+    }
+  }
 
   const meta   = State.get(STATE_KEYS.DOC_META);
   const paras  = State.get(STATE_KEYS.PARAGRAPHS);
@@ -38,6 +61,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('docName').textContent = meta.file_name;
   document.getElementById('docParas').textContent = paras.length;
   maxSlider.max = paras.length;
+
+  if (typeof renderPreAnalysisTable === 'function') {
+    renderPreAnalysisTable();
+  }
 
   // Already done?
   if (results && results.length) {
@@ -84,6 +111,7 @@ document.getElementById('reAnalyzeBtn')?.addEventListener('click', () => {
   State.clear(STATE_KEYS.SESSION_ID);
   completeBanner.style.display = 'none';
   configSection.style.display  = '';
+  document.getElementById('preAnalysisCard').style.display = '';
   liveBody.innerHTML = '';
   liveTableSection.style.display = 'none';
   collectedResults = [];
@@ -112,6 +140,8 @@ async function startAnalysis() {
   collectedResults = [];
   startBtn.disabled = true;
   settingsCard.style.display = 'none';
+  const preAnalysisCard = document.getElementById('preAnalysisCard');
+  if (preAnalysisCard) preAnalysisCard.style.display = 'none';
 
   // Show progress
   progressSection.style.display = '';
@@ -141,6 +171,8 @@ function resumeAnalysis(session_id) {
   collectedResults = [];
   startBtn.disabled = true;
   settingsCard.style.display = 'none';
+  const preAnalysisCard = document.getElementById('preAnalysisCard');
+  if (preAnalysisCard) preAnalysisCard.style.display = 'none';
 
   progressSection.style.display = '';
   liveTableSection.style.display = '';
@@ -202,6 +234,8 @@ function handleCancelComplete() {
   progressSection.style.display = 'none';
   startBtn.disabled = false;
   settingsCard.style.display = '';
+  const preAnalysisCard = document.getElementById('preAnalysisCard');
+  if (preAnalysisCard) preAnalysisCard.style.display = '';
   showToast('Analysis cancelled.', 'warning');
 }
 
@@ -265,7 +299,8 @@ async function handleComplete(results) {
         results: results,
         document_name: meta?.file_name,
         user_id: user?.id,
-        paragraphs: paras || []
+        paragraphs: paras || [],
+        doc_id: window.currentDocId
       })
     });
     
@@ -289,6 +324,8 @@ function handleError(msg) {
   progressSection.style.display = 'none';
   startBtn.disabled = false;
   settingsCard.style.display = '';
+  const preAnalysisCard = document.getElementById('preAnalysisCard');
+  if (preAnalysisCard) preAnalysisCard.style.display = '';
   showToast('Analysis error: ' + msg, 'error', 8000);
 }
 

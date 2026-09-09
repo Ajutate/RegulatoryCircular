@@ -401,16 +401,49 @@ async def stream_analysis(session_id: str):
 # ------------------------------------------------------------------ #
 #  Auto-save Draft endpoint                                          #
 # ------------------------------------------------------------------ #
+@app.post("/api/document/save_extracted")
+async def save_extracted(body: dict):
+    """
+    Save the extracted paragraphs before AI analysis (pending_analysis).
+    Body: { document_name: str, user_id: str, paragraphs: [...] }
+    """
+    doc_name: str = body.get("document_name", "Regulatory_Analysis")
+    user_id: str = body.get("user_id", "")
+    paragraphs: list[str] = body.get("paragraphs", [])
+
+    if not paragraphs:
+        raise HTTPException(status_code=400, detail="No paragraphs provided.")
+
+    try:
+        doc_id = str(uuid.uuid4())
+        save_document(
+            doc_id=doc_id,
+            file_name=doc_name,
+            circular_name=doc_name,
+            paragraph_count=len(paragraphs),
+            excel_blob=None,
+            submitted_by=user_id or None,
+            analysis_results=[],
+            paragraphs=paragraphs,
+            status="pending_analysis"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Extracted saving failed: {e}")
+
+    return {"status": "ok", "doc_id": doc_id}
+
+
 @app.post("/api/document/save_draft")
 async def save_draft(body: dict):
     """
     Save the analysis results as a draft to the database.
-    Body: { results: [...], document_name: str, user_id: str, paragraphs: [...] }
+    Body: { results: [...], document_name: str, user_id: str, paragraphs: [...], doc_id?: str }
     """
     raw_results: list[dict] = body.get("results", [])
     doc_name: str = body.get("document_name", "Regulatory_Analysis")
     user_id: str = body.get("user_id", "")
     paragraphs: list[str] = body.get("paragraphs", [])
+    existing_doc_id: str = body.get("doc_id", "")
 
     if not raw_results:
         raise HTTPException(status_code=400, detail="No results provided.")
@@ -421,17 +454,23 @@ async def save_draft(body: dict):
         raise HTTPException(status_code=422, detail=f"Invalid result format: {e}")
 
     try:
-        doc_id = str(uuid.uuid4())
-        save_document(
-            doc_id=doc_id,
-            file_name=doc_name,
-            circular_name=doc_name,
-            paragraph_count=len(results),
-            excel_blob=None,  # No Excel generation during Maker flow
-            submitted_by=user_id or None,
-            analysis_results=raw_results,
-            paragraphs=paragraphs,
-        )
+        if existing_doc_id:
+            for idx, r in enumerate(raw_results):
+                r["paragraph_text"] = paragraphs[idx] if paragraphs and idx < len(paragraphs) else r.get("paragraph_text", "")
+            update_document_results(existing_doc_id, raw_results)
+            doc_id = existing_doc_id
+        else:
+            doc_id = str(uuid.uuid4())
+            save_document(
+                doc_id=doc_id,
+                file_name=doc_name,
+                circular_name=doc_name,
+                paragraph_count=len(results),
+                excel_blob=None,
+                submitted_by=user_id or None,
+                analysis_results=raw_results,
+                paragraphs=paragraphs,
+            )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Draft saving failed: {e}")
 
@@ -577,6 +616,14 @@ async def regenerate_paragraph(doc_id: str, idx: int):
         # Determine if it's skipped
         is_skipped = (result_dict.get("para_type") == "Information Para" and result_dict.get("actionable") == "Not Applicable")
         
+        # Preserve date fields from the existing result
+        if doc.get("analysis_results_json"):
+            existing_results = json.loads(doc["analysis_results_json"])
+            if 0 <= idx < len(existing_results):
+                existing_result = existing_results[idx]
+                result_dict["has_effective_date"] = existing_result.get("has_effective_date", result_dict.get("has_effective_date"))
+                result_dict["effective_date"] = existing_result.get("effective_date", result_dict.get("effective_date"))
+
         # Update the database and clear needs_regeneration flag
         result_dict["needs_regeneration"] = False
         update_paragraph_result(doc_id, idx, result_dict)

@@ -265,6 +265,7 @@ def save_document(
     submitted_by: Optional[str] = None,
     analysis_results: Optional[List[Dict[str, Any]]] = None,
     paragraphs: Optional[List[str]] = None,
+    status: str = "draft",
 ):
     """Save a processed document and its Excel export to the database."""
     db = SessionLocal()
@@ -277,12 +278,13 @@ def save_document(
             paragraph_count=paragraph_count,
             excel_blob=excel_blob,
             submitted_by=submitted_by,
-            status="draft",
+            status=status,
         )
         db.add(db_doc)
         
-        if analysis_results and paragraphs:
-            for idx, (result, text) in enumerate(zip(analysis_results, paragraphs)):
+        if paragraphs:
+            for idx, text in enumerate(paragraphs):
+                result = analysis_results[idx] if analysis_results and idx < len(analysis_results) else {}
                 para = Paragraph(
                     document_id=doc_id,
                     paragraph_index=idx,
@@ -572,20 +574,57 @@ def update_paragraph_result(doc_id: str, idx: int, result_json: dict) -> bool:
         db.close()
 
 def update_document_results(doc_id: str, analysis_results: List[Dict[str, Any]]) -> bool:
-    """Update all results for a document after a re-analysis."""
+    """Update all results for a document after a re-analysis or initial analysis."""
     db = SessionLocal()
     try:
         doc = db.query(DocumentHistory).filter(DocumentHistory.id == doc_id).first()
         if not doc:
             return False
             
+        doc.paragraph_count = len(analysis_results)
+        
         for p in doc.paragraphs:
             db.delete(p)
+        db.flush()
+        
+        # Check if there is exactly one unique effective date in all results
+        valid_dates = set()
+        for r in analysis_results:
+            d = r.get("effective_date")
+            if d and d.strip() and d.strip().lower() not in ["n/a", "none", "null"]:
+                valid_dates.add(d.strip())
+                
+        if len(valid_dates) == 1:
+            global_date = list(valid_dates)[0]
+            for r in analysis_results:
+                r["effective_date"] = global_date
+                r["has_effective_date"] = "Yes"
             
         for idx, result in enumerate(analysis_results):
-            pass
+            para = Paragraph(
+                document_id=doc_id,
+                paragraph_index=idx,
+                paragraph_text=result.get("paragraph_text", ""),
+                para_type=result.get("para_type"),
+                business_unit=result.get("business_unit"),
+                theme=result.get("theme"),
+                has_effective_date=result.get("has_effective_date"),
+                effective_date=result.get("effective_date"),
+                control_object_name=result.get("control_object_name"),
+                actionable=result.get("actionable"),
+                level_1=result.get("level_1"),
+                level_2=result.get("level_2"),
+                level_3=result.get("level_3"),
+                status=result.get("status", "Pending")
+            )
+            db.add(para)
             
-        return False
+        # Ensure status is moved to draft after analysis if it was pending
+        if doc.status == "pending_analysis":
+            doc.status = "draft"
+            
+        db.commit()
+        return True
     finally:
         db.close()
 

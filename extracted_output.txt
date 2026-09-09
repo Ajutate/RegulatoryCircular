@@ -1,0 +1,630 @@
+PARA 0:
+## FIRST NATIONAL BANK New Employee Onboarding Guide
+
+PARA 1:
+Retail Banking Division | Version 3.1 | Effective: January 2025 Classification: INTERNAL -For Authorized Employees Only
+
+PARA 2:
+1. Welcome & Overview
+
+PARA 3:
+2. Our Mission, Vision & Core Values
+
+PARA 4:
+3. Code of Conduct & Ethics
+
+PARA 5:
+4. Know Your Customer (KYC) & Anti-Money Laundering (AML)
+
+PARA 6:
+5. Data Privacy & Information Security
+
+PARA 7:
+6. Retail Banking Products Overview
+
+PARA 8:
+7. Branch Operations & Daily Procedures
+
+PARA 9:
+8. Customer Service Standards
+
+PARA 10:
+9. Compliance & Regulatory Framework
+
+PARA 11:
+10. Human Resources Policies
+
+PARA 12:
+11. Emergency & Escalation Procedures
+
+PARA 13:
+12. Key Contacts & Resources
+
+PARA 14:
+## 1. Welcome & Overview
+
+PARA 15:
+Welcome to First National Bank! You are joining a team of over 12,000 professionals dedicated to helping individuals, families, and businesses achieve their financial goals. This onboarding guide is your primary reference for the first 90 days of your employment and beyond. Please read it carefully and keep it accessible throughout your onboarding period. First National Bank was established in 1923 and today operates 380 branches across 14 states, manages assets exceeding $85 billion, and serves more than 4.2 million customers. Our success is built on trust, integrity, and a relentless commitment to exceptional service.
+
+PARA 16:
+## 1.1  Your First 30 Days
+
+PARA 17:
+1. Complete all mandatory compliance training modules in the LMS system within 5 business days.
+
+PARA 18:
+2. Attend the two-day New Employee Orientation (NEO) program at your regional training center.
+
+PARA 19:
+3. Shadow your assigned buddy/mentor for the first two weeks.
+
+PARA 20:
+4. Complete your IT system access request form and collect your security badge.
+
+PARA 21:
+5. Read and sign the Code of Conduct, IT Acceptable Use Policy, and Conflict of Interest Disclosure.
+
+PARA 22:
+6. Schedule a 30-day check-in meeting with your direct manager.
+
+PARA 23:
+## 2. Mission, Vision & Core Values
+
+PARA 24:
+## 2.1  Our Mission
+
+PARA 25:
+To empower every customer to achieve financial well-being through trusted advice, innovative products, and personalized service.
+
+PARA 26:
+## 2.2  Our Vision
+
+PARA 27:
+To be the most trusted community bank in America -where customers feel valued, employees feel proud, and communities thrive.
+
+PARA 28:
+## 2.3  Core Values (I-CARES)
+
+PARA 29:
+- Integrity: We act with honesty and transparency in every interaction.
+
+PARA 30:
+- Customer Focus: We put the customer's needs at the center of every decision.
+
+PARA 31:
+- Accountability: We own our actions, our results, and our promises.
+
+PARA 32:
+- Respect: We treat every person with dignity regardless of background or role.
+
+PARA 33:
+- Excellence: We pursue continuous improvement in everything we do.
+
+PARA 34:
+- Security: We protect customer data, bank assets, and community trust above all else.
+
+PARA 35:
+## 3. Code of Conduct & Ethics
+
+PARA 36:
+All First National Bank employees are expected to maintain the highest ethical standards. The Code of Conduct is not optional -violations may result in disciplinary action up to and including termination, and may be reported to regulatory authorities.
+
+PARA 37:
+## 3.1  Prohibited Activities
+
+PARA 38:
+- Accepting gifts, meals, or entertainment from customers or vendors valued over $25 without manager approval.
+
+PARA 39:
+- Disclosing customer account information to unauthorized persons, including family members.
+
+PARA 40:
+- Accessing customer accounts for which you are not directly responsible (unauthorized account access).
+
+PARA 41:
+- Conducting personal financial transactions using bank systems during business hours.
+
+PARA 42:
+- Using bank resources (computers, phones, email) for personal business, political activities, or illegal purposes.
+
+PARA 43:
+- Falsifying any bank record, document, or report.
+
+PARA 44:
+- Engaging in any transaction with a customer in which you have an undisclosed personal interest (self-dealing).
+
+PARA 45:
+- Discussing confidential bank strategies, financial results, or customer information on social media.
+
+PARA 46:
+## 3.2  Conflict of Interest
+
+PARA 47:
+You must disclose any situation where your personal interests could conflict -or appear to conflict -with the interests of the bank or its customers. This includes: romantic relationships with direct reports, ownership stakes in vendor companies, and providing banking services to close family members. Disclose all potential conflicts using the online COI Disclosure Form within 10 days of joining.
+
+PARA 48:
+## 3.3  Whistleblower Protection
+
+PARA 49:
+First National Bank strictly prohibits retaliation against any employee who, in good faith, reports a suspected violation of law, regulation, or bank policy. Reports can be made anonymously through the Ethics Hotline at 1-800-555-ETHIC or at ethics.fnb-internal.com.
+
+PARA 50:
+## 4. Know Your Customer (KYC) & Anti-Money Laundering (AML)
+
+PARA 51:
+As a bank employee, you play a critical role in protecting the financial system from being used for money laundering, terrorism financing, and fraud. Failure to follow KYC/AML procedures can result in severe penalties for the bank and for you personally, including criminal prosecution.
+
+PARA 52:
+## 4.1  Customer Identification Program (CIP)
+
+PARA 53:
+Before opening any new account or establishing a new customer relationship, you MUST collect and verify:
+
+PARA 54:
+- Full legal name (as on government-issued ID)
+
+PARA 55:
+- Date of birth
+
+PARA 56:
+- Residential address (not P.O. Box for individual customers)
+
+PARA 57:
+- Tax Identification Number (Social Security Number for US persons, or EIN for businesses)
+
+PARA 58:
+- Valid government-issued photo ID (driver's license, passport, or state ID)
+
+PARA 59:
+Business customers additionally require: Certificate of Incorporation or equivalent, Beneficial Ownership Certification (for entities with ≥25% ownership), and Business License.
+
+PARA 60:
+## 4.2  Suspicious Activity Recognition
+
+PARA 61:
+Report any of the following patterns to your BSA Officer immediately:
+
+PARA 62:
+- Customers who are unusually secretive about the source of funds or the nature of their business.
+
+PARA 63:
+- Large cash transactions (≥$10,000) that appear inconsistent with the customer's profile.
+
+PARA 64:
+- Frequent just-below-threshold transactions (structuring), e.g., multiple $9,900 deposits.
+
+PARA 65:
+- Rapid movement of large sums through multiple accounts with no apparent business reason.
+
+PARA 66:
+- Customers who request that records not be kept, or who show unusual interest in reporting thresholds.
+
+PARA 67:
+- Wire transfers to/from high-risk jurisdictions flagged by OFAC or FATF.
+
+PARA 68:
+- New customers who immediately request large wire transfers or cashier's checks.
+
+PARA 69:
+## 4.3  Currency Transaction Reports (CTR) & Suspicious Activity Reports (SAR)
+
+PARA 70:
+A Currency Transaction Report (CTR) must be filed with FinCEN for all cash transactions exceeding $10,000 in a single business day -regardless of whether the activity seems suspicious. This is MANDATORY and cannot be waived. CTRs must be filed within 15 calendar days.
+
+PARA 71:
+A Suspicious Activity Report (SAR) must be filed within 30 calendar days of detecting suspicious activity. Employees must NEVER tip off the customer that a SAR is being or may be filed. Doing so is a federal crime. Contact your BSA Officer for guidance.
+
+PARA 72:
+## 4.4  OFAC Screening
+
+PARA 73:
+All new customers and all wire transfer parties must be screened against the OFAC Specially Designated Nationals (SDN) list before any transaction is processed. The bank's core banking system performs automated screening, but employees must escalate any potential match immediately. Do NOT process a transaction with a potential OFAC hit -freeze it and contact Compliance.
+
+PARA 74:
+## 5. Data Privacy & Information Security
+
+PARA 75:
+## 5.1  Gramm-Leach-Bliley Act (GLBA) Obligations
+
+PARA 76:
+Under GLBA, we are required to protect the security and confidentiality of customers' nonpublic personal information (NPI). NPI includes: account numbers, balances, transaction history, credit scores, Social Security numbers, and any other personally identifiable financial information.
+
+PARA 77:
+- Never share NPI with third parties without a valid customer authorization or legal basis.
+
+PARA 78:
+- Always use the bank's secure file transfer system -never email NPI unencrypted.
+
+PARA 79:
+- Lock your workstation (Win+L) whenever you leave your desk, even briefly.
+
+PARA 80:
+- Shred all physical documents containing NPI -do not place them in regular waste bins.
+
+PARA 81:
+- Only access customer data that is necessary for your current job function (minimum necessary principle).
+
+PARA 82:
+## 5.2  Password & Access Security
+
+PARA 83:
+- Passwords must be at least 14 characters and changed every 90 days.
+
+PARA 84:
+- Never share your password or allow others to use your credentials.
+
+PARA 85:
+- Multi-factor authentication (MFA) is required for all remote access and privileged systems.
+
+PARA 86:
+- Report any suspected account compromise immediately to the IT Security helpdesk: ext. 4-HELP.
+
+PARA 87:
+- Do not install unauthorized software on bank devices.
+
+PARA 88:
+- Personal USB drives are prohibited on bank computers.
+
+PARA 89:
+## 5.3  Incident Reporting
+
+PARA 90:
+Report any actual or suspected security incident -including lost devices, phishing emails, or unauthorized access -within ONE HOUR of discovery to: IT Security Hotline: 1-800555-4357 or security@fnb-internal.com. Do not attempt to investigate or remediate the incident yourself.
+
+PARA 91:
+## 6. Retail Banking Products Overview
+
+PARA 92:
+Familiarize yourself with the core products you will discuss with customers daily.
+
+PARA 93:
+## 6.1  Deposit Accounts
+
+PARA 94:
+- FNB Basic Checking: No monthly fee with e-statements; $25 minimum opening deposit; free debit card; no overdraft fee (transactions decline if insufficient funds).
+
+PARA 95:
+- FNB Advantage Checking: $12/month fee waived with $1,500 average daily balance or $3,000 in combined balances; includes one free stop payment per month; earns 0.01% APY.
+
+PARA 96:
+- FNB Premium Checking: For customers with $25,000+ in deposits or investments; dedicated relationship banker; free wire transfers; 0.05% APY.
+
+PARA 97:
+- Regular Savings: 0.05% APY; $5 minimum balance; up to 6 withdrawals per month; automatic savings programs available.
+
+PARA 98:
+- High-Yield Savings: 0.45% APY; $10,000 minimum balance; targeted at customers building emergency funds or saving for major purchases.
+
+PARA 99:
+- Money Market Account: Tiered rates up to 0.80% APY; $2,500 minimum; checkwriting privileges; up to 6 transactions per month.
+
+PARA 100:
+- Certificates of Deposit (CDs): Terms from 3 months to 5 years; rates from 1.00% to 4.75% APY; early withdrawal penalty applies.
+
+PARA 101:
+## 6.2  Lending Products
+
+PARA 102:
+- Personal Loans: Unsecured; $1,000 -$50,000; terms 12 -60 months; rates from 7.99% -24.99% APR based on credit score.
+
+PARA 103:
+- Home Equity Line of Credit (HELOC): Variable rate; up to 85% CLTV; 10-year draw period + 20-year repayment; prime-based rate.
+
+PARA 104:
+- Mortgage Loans: Conventional, FHA, VA, USDA; fixed and adjustable rate; dedicated mortgage specialists handle applications.
+
+PARA 105:
+- Auto Loans: New and used vehicles; terms 24 -84 months; rates from 5.49% APR; same-day decisions for qualified applicants.
+
+PARA 106:
+- Credit Cards: Signature Rewards (2x points on dining/travel), Cashback Plus (1.5% unlimited cashback), Secured Card (for credit building).
+
+PARA 107:
+## 6.3  Digital Banking Services
+
+PARA 108:
+- FNB Mobile App: Available on iOS and Android; mobile check deposit; Zelle® integration; account alerts; card controls.
+
+PARA 109:
+- Online Banking: Full account management; bill pay; external transfers; eStatements; up to 7 years of statement history.
+
+PARA 110:
+- FNB Business Online: Multi-user access with role-based permissions; ACH origination; wire transfers; positive pay fraud detection.
+
+PARA 111:
+- 24/7 Phone Banking: 1-800-555-BANK -automated balance inquiries, transfers, and payment information.
+
+PARA 112:
+## 7. Branch Operations & Daily Procedures
+
+PARA 113:
+## 7.1  Opening Procedures
+
+PARA 114:
+7. Arrive at least 15 minutes before branch opens. Sign in on the attendance log.
+
+PARA 115:
+8. Collect your cash drawer from the vault. Count and verify your starting balance against the Teller Settlement Sheet.
+
+PARA 116:
+9. Test all equipment: cash counter, coin sorter, ID scanner, workstation login.
+
+PARA 117:
+10. Review the daily briefing email for rate changes, product promotions, fraud alerts, and operational notices.
+
+PARA 118:
+11. Ensure your station is clean, organized, and free of personal items visible to customers.
+
+PARA 119:
+12. Verify the transaction log from the prior day is balanced and filed.
+
+PARA 120:
+## 7.2  Teller Cash Handling
+
+PARA 121:
+Cash handling accuracy is critically important. Every teller is responsible for their own drawer. Key rules:
+
+PARA 122:
+- Count cash in front of the customer at the time of transaction.
+
+PARA 123:
+- Place bills received from customers face-up and in the same direction before processing.
+
+PARA 124:
+- Always use the counterfeit detection pen and UV light for bills $20 and above.
+
+PARA 125:
+- Never leave cash unattended on your counter. Never leave your drawer unlocked.
+
+PARA 126:
+- For transactions over $3,000, a supervisor override is required.
+
+PARA 127:
+- Drawer differences must be reported immediately to your supervisor -do not attempt to balance by adjusting records.
+
+PARA 128:
+- End-of-day balancing must be completed before leaving your workstation.
+
+PARA 129:
+## 7.3  Vault Access
+
+PARA 130:
+The vault requires dual control -at least two authorized employees must be present whenever the vault is opened or closed. Never enter the vault alone. Log all vault access in the Vault Activity Register including: time, purpose, employee names, and amounts moved.
+
+PARA 131:
+## 7.4  Closing Procedures
+
+PARA 132:
+13. Stop accepting customers 15 minutes before closing time (as per branch policy).
+
+PARA 133:
+14. Balance your drawer. Complete the Teller Settlement Sheet and have your supervisor sign off.
+
+PARA 134:
+15. Secure all cash in the vault. Record the closing balance in the Vault Register.
+
+PARA 135:
+16. Lock all file cabinets. Shred any documents with customer information left on desks.
+
+PARA 136:
+17. Log out of all systems. Ensure your workstation is locked.
+
+PARA 137:
+18. Activate the branch alarm. Do not leave alone -at least two employees must exit together (buddy system).
+
+PARA 138:
+## 8. Customer Service Standards
+
+PARA 139:
+Every customer interaction is an opportunity to build trust and loyalty. First National Bank measures customer satisfaction through NPS (Net Promoter Score) and monthly branch surveys. Our target NPS is 72+.
+
+PARA 140:
+## 8.1  The FNB Service Promise (GREET)
+
+PARA 141:
+- Greet: Acknowledge every customer within 30 seconds of entering the branch. Make eye contact and smile.
+
+PARA 142:
+- Relate: Use the customer's name at least twice during the interaction. Show genuine interest.
+
+PARA 143:
+- Explore: Ask open-ended questions to understand the customer's full financial picture.
+
+PARA 144:
+- Educate: Explain products and services clearly. Avoid jargon. Confirm customer understanding.
+
+PARA 145:
+- Thank: Thank the customer by name when the transaction is complete. Invite them to return.
+
+PARA 146:
+## 8.2  Complaint Handling
+
+PARA 147:
+When a customer expresses dissatisfaction, follow the LAST model:
+
+PARA 148:
+- Listen: Let the customer speak without interrupting. Do not be defensive.
+
+PARA 149:
+- Apologize: Acknowledge the customer's frustration sincerely. 'I'm sorry you experienced this.'
+
+PARA 150:
+- Solve: Offer a concrete resolution. If you cannot resolve it immediately, set a clear follow-up timeline.
+
+PARA 151:
+- Thank: Thank the customer for bringing the issue to your attention.
+
+PARA 152:
+All formal complaints must be logged in the Complaints Management System (CMS) within 24 hours. Complaints involving potential regulatory violations (UDAP, discrimination, RESPA) must be escalated to Compliance immediately.
+
+PARA 153:
+## 9. Compliance & Regulatory Framework
+
+PARA 154:
+First National Bank operates under a comprehensive regulatory framework. All employees are expected to understand the key regulations affecting their role.
+
+PARA 155:
+- Bank Secrecy Act (BSA): Requires financial institutions to detect and prevent money laundering. Drives our AML, CTR, and SAR obligations.
+
+PARA 156:
+- USA PATRIOT Act: Requires Customer Identification Programs (CIP) and enhanced due diligence for high-risk customers.
+
+PARA 157:
+- Gramm-Leach-Bliley Act (GLBA): Mandates protection of customer financial data and privacy notices.
+
+PARA 158:
+- Equal Credit Opportunity Act (ECOA): Prohibits discrimination in lending based on race, sex, national origin, religion, age, or receipt of public assistance.
+
+PARA 159:
+- Fair Housing Act (FHA): Prohibits discrimination in residential real estate transactions.
+
+PARA 160:
+- Truth in Lending Act (TILA) / Reg Z: Requires clear disclosure of loan terms, APR, and total cost of credit.
+
+PARA 161:
+- Truth in Savings Act (TISA) / Reg DD: Requires accurate disclosure of deposit account terms including APY and fees.
+
+PARA 162:
+- Community Reinvestment Act (CRA): Requires banks to meet the credit needs of all communities they serve, including low- and moderate-income areas.
+
+PARA 163:
+- OFAC Regulations: Prohibits transactions with sanctioned individuals, entities, and countries.
+
+PARA 164:
+- Unfair, Deceptive, or Abusive Acts or Practices (UDAAP): Prohibits practices that mislead or harm consumers. Covers advertising, sales scripts, and fee disclosures.
+
+PARA 165:
+## 9.1  Mandatory Training Requirements
+
+PARA 166:
+- BSA/AML Annual Certification -due within 30 days of hire and every January thereafter.
+
+PARA 167:
+- Information Security Awareness -due within 15 days of hire and every October thereafter.
+
+PARA 168:
+- Code of Conduct Attestation -due within 10 days of hire and every year.
+
+PARA 169:
+- UDAAP Training -due within 30 days of hire and every March thereafter.
+
+PARA 170:
+- Fair Lending Training -due within 30 days of hire (required for all lending and frontline roles).
+
+PARA 171:
+Failure to complete mandatory training by the deadline may result in system access suspension.
+
+PARA 172:
+## 10. Human Resources Policies
+
+PARA 173:
+## 10.1  Attendance & Punctuality
+
+PARA 174:
+Regular attendance is essential for branch operations. If you are unable to come to work, notify your supervisor at least ONE HOUR before your scheduled start time by phone -text messages are not acceptable for absence notifications. Excessive absenteeism (more than 3 unplanned absences in a rolling 90-day period) may result in a formal corrective action. Four or more consecutive days of absence require a physician's note upon return.
+
+PARA 175:
+## 10.2  Dress Code
+
+PARA 176:
+Customer-facing employees must dress in business professional or business casual attire. FNB logo wear is encouraged on designated days. Clothing with logos, slogans, or graphics (other than FNB branding) is not permitted. Closed-toe shoes are required on the teller line. Visible tattoos and piercings should be minimal and inoffensive in a professional banking environment.
+
+PARA 177:
+## 10.3  Performance Reviews
+
+PARA 178:
+Performance is formally reviewed twice per year: mid-year (July) and year-end (December). The review considers: goal achievement, compliance adherence, customer satisfaction scores, team collaboration, and professional development progress. Merit increases are tied to year-end performance ratings on a 1 -5 scale. A rating of 3 or above is required for merit eligibility.
+
+PARA 179:
+## 10.4  Benefits Summary
+
+PARA 180:
+- Health Insurance: Medical (PPO & HMO options), Dental, and Vision -effective first of the month after 30 days.
+
+PARA 181:
+- 401(k): Eligible after 90 days; bank matches 100% of first 4% of salary contributed.
+
+PARA 182:
+- Paid Time Off (PTO): 15 days/year for years 0 -3; 20 days for years 4 -7; 25 days for 8+ years. Plus 11 federal holidays.
+
+PARA 183:
+- Tuition Assistance: Up to $5,250/year for job-related degrees. Requires manager approval and minimum C grade.
+
+PARA 184:
+- Employee Banking Benefits: Free checking account, waived CD minimum, 0.25% discount on personal loans.
+
+PARA 185:
+- Wellness Program: $500 annual wellness reimbursement for gym, fitness equipment, or wellness apps.
+
+PARA 186:
+- Life & Disability Insurance: 1x salary basic life insurance provided at no cost; supplemental available.
+
+PARA 187:
+## 11. Emergency & Escalation Procedures
+
+PARA 188:
+## 11.1  Robbery Response
+
+PARA 189:
+Your safety is the bank's highest priority. If the branch is being robbed:
+
+PARA 190:
+19. Stay calm. Do not resist. Comply with the robber's demands.
+
+PARA 191:
+20. Activate the silent alarm if you can do so safely without being noticed.
+
+PARA 192:
+21. Note the robber's description: height, weight, clothing, hair color, any distinguishing features.
+
+PARA 193:
+22. Do not chase the robber. Do not touch the counter area where the robber stood.
+
+PARA 194:
+23. After the robber leaves, call 911 immediately, then contact your Branch Manager.
+
+PARA 195:
+24. Lock the branch doors. Do not allow anyone to enter or leave until police arrive.
+
+PARA 196:
+25. Do not discuss the incident with other employees before speaking with law enforcement.
+
+PARA 197:
+## 11.2  System Outage
+
+PARA 198:
+In the event of a core banking system outage, switch to manual backup procedures: collect paper transaction tickets, limit cash transactions to $500 without manager approval, do not process wire transfers, and contact IT Operations at ext. 4-OPS. The Branch Manager must be notified immediately for any outage exceeding 15 minutes.
+
+PARA 199:
+## 11.3  Suspicious Package / Threat
+
+PARA 200:
+If you receive a suspicious package, a bomb threat, or discover an unknown device on the premises: Do NOT touch, move, or open it. Evacuate the immediate area. Call 911 and notify your Branch Manager. Follow the building evacuation plan posted at each emergency exit.
+
+PARA 201:
+## 12. Key Contacts & Resources
+
+PARA 202:
+| Department / Resource   | Contact Information                                                     | |-------------------------|-------------------------------------------------------------------------| | HR Service Center       | hr@fnb-internal.com | 1-800-555-4HR7 | Mon - Fri 8am - 6pm ET | | IT Helpdesk             | helpdesk@fnb-internal.com | Ext. 4-HELP                            |
+
+PARA 203:
+|                             | (4-4357) | 24/7                                                       | |-----------------------------|----------------------------------------------------------------------------| | IT Security Hotline         | security@fnb-internal.com | 1-800-555- 4357 | 24/7 for incidents | | BSA / Compliance            | bsa@fnb-internal.com | Ext. 5-BSA | For AML/SAR questions        | | Ethics Hotline (anonymous)  | 1-800-555-ETHIC | ethics.fnb-internal.com | 24/7                 | | Loan Operations             | loanops@fnb-internal.com | Ext. 5-LOAN                                | | Wire Transfer Desk          | wires@fnb-internal.com | Ext. 5-WIRE | Cutoff: 4:00 PM ET        | | OFAC / Sanctions            | ofac@fnb-internal.com | Ext. 5-OFAC | For screening hits         | | Fraud Hotline               | fraud@fnb-internal.com | 1-800-555- FRAUD | 24/7                 | | Customer Service (external) | 1-800-555-BANK | For escalation to regional management                |
+
+PARA 204:
+## Employee Acknowledgment
+
+PARA 205:
+By signing below, I acknowledge that I have received, read, and understood the First National Bank New Employee Onboarding Guide. I agree to comply with all policies, procedures, and standards described herein and understand that violations may result in disciplinary action up to and including termination of employment.
+
+PARA 206:
+Employee Full Name (Print): \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
+PARA 207:
+Employee Signature: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_  Date: \_\_\_\_\_\_\_\_\_\_
+
+PARA 208:
+Manager Name (Print): \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
+PARA 209:
+Manager Signature: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_  Date: \_\_\_\_\_\_\_\_\_\_
+
