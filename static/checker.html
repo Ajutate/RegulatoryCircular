@@ -6,6 +6,7 @@
   <title>Checker — Review Queue</title>
   <link href="/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 </head>
 <body class="bg-body-tertiary">
 <div class="d-flex min-vh-100 flex-column flex-md-row">
@@ -33,12 +34,23 @@
     </div>
 
     <div class="container-fluid p-3 p-md-4 p-xl-5" id="queueSection">
-      <div class="mb-4">
-        <h2 class="fw-bold text-navy mb-1">✅ Review Queue</h2>
-        <p class="text-secondary mb-0">Documents submitted by Makers awaiting your review.</p>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold text-navy mb-1">✅ Review Queue</h2>
+          <p class="text-secondary mb-0">Documents submitted by Makers awaiting your review.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <label for="checkerPageSize" class="form-label small text-secondary mb-0 text-nowrap">Records per page:</label>
+          <select id="checkerPageSize" class="form-select form-select-sm" style="width:auto;">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </div>
       </div>
 
-      <div class="mb-4 mt-5">
+      <div class="mb-4 mt-4">
         <h4 class="fw-bold text-navy mb-1">Unassigned Review Pool</h4>
         <p class="text-secondary mb-0">Documents waiting to be claimed by a checker.</p>
       </div>
@@ -66,6 +78,19 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <!-- Pagination footer: Unassigned pool -->
+          <div id="unassignedFooter" class="d-none border-top px-4 py-3 d-flex align-items-center justify-content-between bg-white">
+            <span id="unassignedCounter" class="text-secondary small d-none"></span>
+            <div class="d-flex align-items-center gap-3 ms-auto">
+              <div id="unassignedFooterSpinner" class="d-none text-secondary small">
+                <div class="spinner-border spinner-border-sm me-1" role="status"></div>
+                Loading more…
+              </div>
+              <span id="unassignedDoneMsg" class="text-success small fw-medium d-none"></span>
+              <span id="unassignedErrorMsg" class="text-danger small d-none"></span>
+              <button id="unassignedLoadMoreBtn" class="btn btn-outline-primary btn-sm rounded-pill px-4 d-none">⬇️ Load More</button>
+            </div>
           </div>
         </div>
       </div>
@@ -98,6 +123,19 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <!-- Pagination footer: My queue -->
+          <div id="myQueueFooter" class="d-none border-top px-4 py-3 d-flex align-items-center justify-content-between bg-white rounded-bottom-4">
+            <span id="myQueueCounter" class="text-secondary small d-none"></span>
+            <div class="d-flex align-items-center gap-3 ms-auto">
+              <div id="myQueueFooterSpinner" class="d-none text-secondary small">
+                <div class="spinner-border spinner-border-sm me-1" role="status"></div>
+                Loading more…
+              </div>
+              <span id="myQueueDoneMsg" class="text-success small fw-medium d-none"></span>
+              <span id="myQueueErrorMsg" class="text-danger small d-none"></span>
+              <button id="myQueueLoadMoreBtn" class="btn btn-outline-primary btn-sm rounded-pill px-4 d-none">⬇️ Load More</button>
+            </div>
           </div>
         </div>
       </div>

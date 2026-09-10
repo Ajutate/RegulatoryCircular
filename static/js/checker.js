@@ -1,8 +1,17 @@
 /* =============================================
-   checker.js — Checker review queue
+   checker.js — Checker review queue (with lazy loading)
    ============================================= */
 
+let PAGE_SIZE = 10;   // default; user can change via dropdown
+
+// Pagination state for each table
+const _state = {
+  unassigned: { skip: 0, total: 0, loading: false, observer: null },
+  my:         { skip: 0, total: 0, loading: false, observer: null },
+};
+
 let rejectDocId = '';
+let _currentUser = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
   const user = JSON.parse(localStorage.getItem('rca_user') || 'null');
@@ -10,16 +19,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.location.href = '/login.html';
     return;
   }
+  _currentUser = user;
 
-  await loadQueue();
+  // Page size dropdown — shared for both tables
+  const pageSizeSel = document.getElementById('checkerPageSize');
+  pageSizeSel.value = String(PAGE_SIZE);
+  pageSizeSel.addEventListener('change', () => {
+    PAGE_SIZE = parseInt(pageSizeSel.value, 10);
+    resetAndReload();
+  });
+
+  // Initial load for both tables
+  await loadUnassignedPage();
+  await loadMyQueuePage();
+
+  // Wire Load More buttons
+  document.getElementById('unassignedLoadMoreBtn').addEventListener('click', () => loadUnassignedPage());
+  document.getElementById('myQueueLoadMoreBtn').addEventListener('click', () => loadMyQueuePage());
 
   // Reject modal confirm
   document.getElementById('confirmRejectBtn').addEventListener('click', async () => {
     const comment = document.getElementById('rejectComment').value.trim();
-    if (!comment) {
-      alert('Please provide a rejection reason.');
-      return;
-    }
+    if (!comment) { alert('Please provide a rejection reason.'); return; }
     try {
       await fetch(`/api/checker/reject/${rejectDocId}`, {
         method: 'POST',
@@ -28,92 +49,103 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       bootstrap.Modal.getInstance(document.getElementById('rejectModal')).hide();
       showToast('Document rejected.', 'warning');
-      setTimeout(() => {
-        window.location.href = 'history.html';
-      }, 1500);
+      setTimeout(() => { window.location.href = 'history.html'; }, 1500);
     } catch (err) {
       showToast('Reject failed: ' + err.message, 'error');
     }
   });
 });
 
-async function loadQueue() {
-  const unassignedBody = document.getElementById('unassignedBody');
-  const myQueueBody = document.getElementById('myQueueBody');
-  const user = JSON.parse(localStorage.getItem('rca_user'));
+function setupObserver(key, sentinelId, loadFn) {
+  // No-op: IntersectionObserver not used; Load More buttons are used instead.
+}
+
+// ──────────────────────────────────────────────
+//  Footer state helpers
+// ──────────────────────────────────────────────
+function setFooter(prefix, state, msg) {
+  // prefix = 'unassigned' | 'myQueue'
+  const footer  = document.getElementById(prefix + 'Footer');
+  const spinner = document.getElementById(prefix + 'FooterSpinner');
+  const loadBtn = document.getElementById(prefix + 'LoadMoreBtn');
+  const counter = document.getElementById(prefix + 'Counter');
+  const doneEl  = document.getElementById(prefix + 'DoneMsg');
+  const errEl   = document.getElementById(prefix + 'ErrorMsg');
+
+  footer.classList.remove('d-none');
+  spinner.classList.add('d-none');
+  loadBtn.classList.add('d-none');
+  counter.classList.add('d-none');
+  doneEl.classList.add('d-none');
+  errEl.classList.add('d-none');
+
+  const s = prefix === 'unassigned' ? _state.unassigned : _state.my;
+
+  if (state === 'hidden') {
+    footer.classList.add('d-none');
+  } else if (state === 'loading') {
+    spinner.classList.remove('d-none');
+  } else if (state === 'more') {
+    loadBtn.classList.remove('d-none');
+    counter.classList.remove('d-none');
+    counter.textContent = `Showing ${s.skip} of ${s.total} records`;
+  } else if (state === 'done') {
+    doneEl.classList.remove('d-none');
+    doneEl.textContent = `✅ All ${s.total} record${s.total !== 1 ? 's' : ''} loaded`;
+  } else if (state === 'error') {
+    errEl.classList.remove('d-none');
+    errEl.textContent = msg || 'Failed to load.';
+  }
+}
+
+// ──────────────────────────────────────────────
+//  Unassigned pool
+// ──────────────────────────────────────────────
+async function loadUnassignedPage() {
+  const s = _state.unassigned;
+  if (s.loading) return;
+  if (s.skip > 0 && s.skip >= s.total) return;
+
+  s.loading = true;
+  const body = document.getElementById('unassignedBody');
+  setFooter('unassigned', 'loading');
 
   try {
-    const resp = await fetch('/api/checker/queue?user_id=' + user.id);
-    const data = await resp.json();
+    const resp = await fetch(
+      `/api/checker/queue?user_id=${_currentUser.id}&unassigned_skip=${s.skip}&unassigned_limit=${PAGE_SIZE}&my_skip=0&my_limit=0`
+    );
+    const data  = await resp.json();
+    const items = data.unassigned || [];
+    s.total = data.unassigned_total || 0;
 
-    // Render Unassigned
-    if (data.unassigned.length === 0) {
-      unassignedBody.innerHTML = `
-        <tr><td colspan="6" class="text-center py-5 text-secondary">
-          No unassigned documents pending review.
-        </td></tr>`;
-    } else {
-      unassignedBody.innerHTML = '';
-      data.unassigned.forEach(doc => {
-        const date = new Date(doc.upload_time).toLocaleString();
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="text-secondary small ps-4">${date}</td>
-          <td class="fw-medium text-navy">${esc(doc.file_name)}</td>
-          <td>${esc(doc.submitter_name || '—')}</td>
-          <td><span class="badge bg-secondary-subtle text-secondary">${doc.paragraph_count}</span></td>
-          <td><span class="badge bg-warning text-dark rounded-pill">Pending Review</span></td>
-          <td class="text-end pe-4">
-            <div class="d-flex justify-content-end gap-1 flex-wrap">
-              <button class="btn btn-sm btn-primary rounded-pill btn-claim" data-id="${doc.id}">✋ Claim</button>
-            </div>
-          </td>
-        `;
-        unassignedBody.appendChild(tr);
-      });
+    if (s.skip === 0) {
+      body.innerHTML = '';
+      if (items.length === 0) {
+        body.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-secondary">No unassigned documents pending review.</td></tr>`;
+        setFooter('unassigned', 'hidden');
+        s.loading = false;
+        return;
+      }
     }
 
-    // Render My Queue
-    if (data.my_queue.length === 0) {
-      myQueueBody.innerHTML = `
-        <tr><td colspan="6" class="text-center py-5 text-secondary">
-          You have no claimed documents pending review.
-        </td></tr>`;
-    } else {
-      myQueueBody.innerHTML = '';
-      data.my_queue.forEach(doc => {
-        const date = new Date(doc.upload_time).toLocaleString();
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="text-secondary small ps-4">${date}</td>
-          <td class="fw-medium text-navy">${esc(doc.file_name)}</td>
-          <td>${esc(doc.submitter_name || '—')}</td>
-          <td><span class="badge bg-secondary-subtle text-secondary">${doc.paragraph_count}</span></td>
-          <td><span class="badge bg-warning text-dark rounded-pill">Pending Review</span></td>
-          <td class="text-end pe-4">
-            <div class="d-flex justify-content-end gap-1 flex-wrap">
-              <button class="btn btn-sm btn-outline-primary rounded-pill btn-review-detail" data-id="${doc.id}" data-name="${esc(doc.file_name)}">📋 Review</button>
-            </div>
-          </td>
-        `;
-        myQueueBody.appendChild(tr);
-      });
-    }
+    items.forEach(doc => appendUnassignedRow(body, doc));
+    s.skip += items.length;
 
-    // Claim buttons
-    unassignedBody.querySelectorAll('.btn-claim').forEach(btn => {
+    // Wire up claim buttons for newly added rows
+    body.querySelectorAll('.btn-claim:not([data-wired])').forEach(btn => {
+      btn.dataset.wired = '1';
       btn.addEventListener('click', async () => {
         try {
           btn.disabled = true;
-          btn.textContent = 'Claiming...';
+          btn.textContent = 'Claiming…';
           const res = await fetch(`/api/checker/claim/${btn.dataset.id}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: user.id }),
+            body: JSON.stringify({ user_id: _currentUser.id }),
           });
           if (!res.ok) throw new Error('Claim failed');
           showToast('Document claimed! ✅', 'success');
-          await loadQueue();
+          resetAndReload();
         } catch (err) {
           showToast(err.message, 'error');
           btn.disabled = false;
@@ -122,17 +154,133 @@ async function loadQueue() {
       });
     });
 
-    // Review Detail buttons
-    myQueueBody.querySelectorAll('.btn-review-detail').forEach(btn => {
-      btn.addEventListener('click', () => {
-        openReviewDetail(btn.dataset.id, btn.dataset.name);
-      });
+    setFooter('unassigned', s.skip >= s.total ? 'done' : 'more');
+  } catch (err) {
+    setFooter('unassigned', 'error', `Error: ${err.message}`);
+  } finally {
+    s.loading = false;
+  }
+}
+
+function appendUnassignedRow(body, doc) {
+  const date = new Date(doc.upload_time).toLocaleString();
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td class="text-secondary small ps-4">${date}</td>
+    <td class="fw-medium text-navy">${esc(doc.file_name)}</td>
+    <td>${esc(doc.submitter_name || '—')}</td>
+    <td><span class="badge bg-secondary-subtle text-secondary">${doc.paragraph_count}</span></td>
+    <td><span class="badge bg-warning text-dark rounded-pill">Pending Review</span></td>
+    <td class="text-end pe-4">
+      <div class="d-flex justify-content-end gap-1 flex-wrap">
+        <button class="btn btn-sm btn-primary rounded-pill btn-claim" data-id="${doc.id}">✋ Claim</button>
+      </div>
+    </td>
+  `;
+  body.appendChild(tr);
+}
+
+// ──────────────────────────────────────────────
+//  My queue
+// ──────────────────────────────────────────────
+async function loadMyQueuePage() {
+  const s = _state.my;
+  if (s.loading) return;
+  if (s.skip > 0 && s.skip >= s.total) return;
+
+  s.loading = true;
+  const body = document.getElementById('myQueueBody');
+  setFooter('myQueue', 'loading');
+
+  try {
+    const resp = await fetch(
+      `/api/checker/queue?user_id=${_currentUser.id}&unassigned_skip=0&unassigned_limit=0&my_skip=${s.skip}&my_limit=${PAGE_SIZE}`
+    );
+    const data  = await resp.json();
+    const items = data.my_queue || [];
+    s.total = data.my_total || 0;
+
+    if (s.skip === 0) {
+      body.innerHTML = '';
+      if (items.length === 0) {
+        body.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-secondary">You have no claimed documents pending review.</td></tr>`;
+        setFooter('myQueue', 'hidden');
+        s.loading = false;
+        return;
+      }
+    }
+
+    items.forEach(doc => appendMyQueueRow(body, doc));
+    s.skip += items.length;
+
+    // Wire up review buttons
+    body.querySelectorAll('.btn-review-detail:not([data-wired])').forEach(btn => {
+      btn.dataset.wired = '1';
+      btn.addEventListener('click', () => openReviewDetail(btn.dataset.id, btn.dataset.name));
     });
 
+    setFooter('myQueue', s.skip >= s.total ? 'done' : 'more');
   } catch (err) {
-    unassignedBody.innerHTML = `<tr><td colspan="5" class="text-danger text-center py-4">Error loading queue</td></tr>`;
-    myQueueBody.innerHTML = `<tr><td colspan="5" class="text-danger text-center py-4">Error loading queue</td></tr>`;
+    setFooter('myQueue', 'error', `Error: ${err.message}`);
+  } finally {
+    s.loading = false;
   }
+}
+
+function appendMyQueueRow(body, doc) {
+  const date = new Date(doc.upload_time).toLocaleString();
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td class="text-secondary small ps-4">${date}</td>
+    <td class="fw-medium text-navy">${esc(doc.file_name)}</td>
+    <td>${esc(doc.submitter_name || '—')}</td>
+    <td><span class="badge bg-secondary-subtle text-secondary">${doc.paragraph_count}</span></td>
+    <td><span class="badge bg-warning text-dark rounded-pill">Pending Review</span></td>
+    <td class="text-end pe-4">
+      <div class="d-flex justify-content-end gap-1 flex-wrap">
+        <button class="btn btn-sm btn-outline-primary rounded-pill btn-review-detail"
+                data-id="${doc.id}" data-name="${esc(doc.file_name)}">📋 Review</button>
+      </div>
+    </td>
+  `;
+  body.appendChild(tr);
+}
+
+// Reset pagination state and reload from scratch (e.g. after claim / page size change)
+function resetAndReload() {
+  // Disconnect old observers
+  if (_state.unassigned.observer) { _state.unassigned.observer.disconnect(); _state.unassigned.observer = null; }
+  if (_state.my.observer)         { _state.my.observer.disconnect();         _state.my.observer = null; }
+
+  _state.unassigned.skip = 0; _state.unassigned.total = 0; _state.unassigned.loading = false;
+  _state.my.skip = 0;         _state.my.total = 0;         _state.my.loading = false;
+
+  // Reset table bodies to loading state
+  document.getElementById('unassignedBody').innerHTML =
+    `<tr><td colspan="6" class="text-center py-5 text-secondary">
+      <div class="spinner-border spinner-border-sm me-2" role="status"></div> Loading...
+    </td></tr>`;
+  document.getElementById('myQueueBody').innerHTML =
+    `<tr><td colspan="6" class="text-center py-5 text-secondary">
+      <div class="spinner-border spinner-border-sm me-2" role="status"></div> Loading...
+    </td></tr>`;
+  // Sentinel elements are optional (used only with IntersectionObserver)
+  const unassignedSentinel = document.getElementById('unassignedSentinel');
+  const myQueueSentinel = document.getElementById('myQueueSentinel');
+  if (unassignedSentinel) unassignedSentinel.classList.add('d-none');
+  if (myQueueSentinel) myQueueSentinel.classList.add('d-none');
+
+  // Re-attach observers and reload
+  setupObserver('unassigned', 'unassignedSentinel', loadUnassignedPage);
+  setupObserver('my', 'myQueueSentinel', loadMyQueuePage);
+
+  loadUnassignedPage();
+  loadMyQueuePage();
+}
+
+// Legacy wrapper kept for backward compatibility
+async function loadQueue() {
+  await resetAndReload();
 }
 
 // ── Detailed Review Logic ──

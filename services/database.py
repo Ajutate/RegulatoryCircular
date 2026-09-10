@@ -308,8 +308,13 @@ def save_document(
         db.close()
 
 
-def get_history(user_id: Optional[str] = None, role: Optional[str] = None) -> List[Dict[str, Any]]:
-    """Retrieve document history. Makers see only their own docs."""
+def get_history(
+    user_id: Optional[str] = None,
+    role: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 20,
+) -> Dict[str, Any]:
+    """Retrieve paginated document history. Makers see only their own docs."""
     db = SessionLocal()
     try:
         query = db.query(DocumentHistory).order_by(DocumentHistory.upload_time.desc())
@@ -331,9 +336,10 @@ def get_history(user_id: Optional[str] = None, role: Optional[str] = None) -> Li
             )
             
             query = query.filter(or_(cond1, cond2))
-            
-        docs = query.all()
-        return [
+
+        total = query.count()
+        docs = query.offset(skip).limit(limit).all()
+        items = [
             {
                 "id": doc.id,
                 "file_name": doc.file_name,
@@ -350,6 +356,7 @@ def get_history(user_id: Optional[str] = None, role: Optional[str] = None) -> Li
             }
             for doc in docs
         ]
+        return {"items": items, "total": total}
     finally:
         db.close()
 
@@ -443,22 +450,34 @@ def get_unassigned_count() -> int:
     finally:
         db.close()
 
-def get_checker_queue(checker_id: str) -> Dict[str, List[Dict[str, Any]]]:
-    """Return documents pending review, split by unassigned and my_queue."""
+def get_checker_queue(
+    checker_id: str,
+    unassigned_skip: int = 0,
+    unassigned_limit: int = 20,
+    my_skip: int = 0,
+    my_limit: int = 20,
+) -> Dict[str, Any]:
+    """Return paginated documents pending review, split by unassigned and my_queue."""
     db = SessionLocal()
     try:
-        docs = (
+        base_query = (
             db.query(DocumentHistory)
             .filter(DocumentHistory.status == "pending_review")
             .order_by(DocumentHistory.upload_time.desc())
-            .all()
         )
-        
-        unassigned = []
-        my_queue = []
-        
-        for doc in docs:
-            item = {
+
+        # Unassigned pool
+        unassigned_query = base_query.filter(DocumentHistory.assigned_to == None)
+        unassigned_total = unassigned_query.count()
+        unassigned_docs = unassigned_query.offset(unassigned_skip).limit(unassigned_limit).all()
+
+        # My queue
+        my_query = base_query.filter(DocumentHistory.assigned_to == checker_id)
+        my_total = my_query.count()
+        my_docs = my_query.offset(my_skip).limit(my_limit).all()
+
+        def _serialize(doc):
+            return {
                 "id": doc.id,
                 "file_name": doc.file_name,
                 "circular_name": doc.circular_name,
@@ -468,12 +487,13 @@ def get_checker_queue(checker_id: str) -> Dict[str, List[Dict[str, Any]]]:
                 "submitter_name": doc.submitter.username if doc.submitter else "",
                 "assigned_to": doc.assigned_to,
             }
-            if not doc.assigned_to:
-                unassigned.append(item)
-            elif doc.assigned_to == checker_id:
-                my_queue.append(item)
-                
-        return {"unassigned": unassigned, "my_queue": my_queue}
+
+        return {
+            "unassigned": [_serialize(d) for d in unassigned_docs],
+            "unassigned_total": unassigned_total,
+            "my_queue": [_serialize(d) for d in my_docs],
+            "my_total": my_total,
+        }
     finally:
         db.close()
 

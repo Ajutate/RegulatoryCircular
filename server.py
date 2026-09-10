@@ -702,9 +702,21 @@ async def checker_pending_count():
     return {"count": get_unassigned_count()}
 
 @app.get("/api/checker/queue")
-async def checker_queue(user_id: str):
-    """Return all documents pending review."""
-    return get_checker_queue(user_id)
+async def checker_queue(
+    user_id: str,
+    unassigned_skip: int = 0,
+    unassigned_limit: int = 20,
+    my_skip: int = 0,
+    my_limit: int = 20,
+):
+    """Return paginated documents pending review."""
+    return get_checker_queue(
+        user_id,
+        unassigned_skip=unassigned_skip,
+        unassigned_limit=unassigned_limit,
+        my_skip=my_skip,
+        my_limit=my_limit,
+    )
 
 
 @app.post("/api/checker/claim/{doc_id}")
@@ -851,9 +863,9 @@ async def checker_save_reanalysis(doc_id: str, body: dict):
 #  History endpoints                                                 #
 # ------------------------------------------------------------------ #
 @app.get("/api/history")
-async def fetch_history(user_id: str = "", role: str = ""):
-    """Return the history of all processed documents."""
-    return get_history(user_id=user_id or None, role=role or None)
+async def fetch_history(user_id: str = "", role: str = "", skip: int = 0, limit: int = 20):
+    """Return paginated history of processed documents."""
+    return get_history(user_id=user_id or None, role=role or None, skip=skip, limit=limit)
 
 @app.get("/api/history/{doc_id}/download")
 async def download_history_excel(doc_id: str):
