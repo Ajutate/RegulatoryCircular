@@ -151,8 +151,10 @@ function renderReviewTable(results, paragraphs) {
 
   function toggleMergeBtn() {
     const checked = document.querySelectorAll('.row-checkbox:checked').length;
-    const btn = document.getElementById('mergeSelectedBtn');
-    if (btn) btn.style.display = checked > 1 ? 'inline-block' : 'none';
+    const mergeBtn = document.getElementById('mergeSelectedBtn');
+    const deleteBtn = document.getElementById('deleteSelectedBtn');
+    if (mergeBtn) mergeBtn.style.display = checked > 1 ? 'inline-block' : 'none';
+    if (deleteBtn) deleteBtn.style.display = checked > 0 ? 'inline-block' : 'none';
   }
   
   checkSubmitState();
@@ -647,6 +649,87 @@ document.getElementById('mergeSelectedBtn')?.addEventListener('click', async () 
     const btn = document.getElementById('mergeSelectedBtn');
     if (btn) btn.style.display = 'none';
     showToast('Merge successful! Click Regenerate when ready.', 'success');
+  } catch (e) {
+    showToast(e.message, 'error');
+  } finally {
+    disableTable(false);
+  }
+});
+
+
+// ================================================================== //
+//  Single-row Delete                                                  //
+// ================================================================== //
+
+async function deleteRow(idx) {
+  const paraText = window.docData.results[idx]?.paragraph_text || '';
+  const preview = paraText.substring(0, 100) + (paraText.length > 100 ? '...' : '');
+
+  const confirmed = await showConfirmModal(
+    '🗑️ Delete Paragraph',
+    `Delete paragraph ${parseInt(idx) + 1}?\n\n"${preview}"\n\nThis paragraph will be removed and won't appear in the Excel export.`,
+    'Delete', 'danger'
+  );
+  if (!confirmed) return;
+
+  try {
+    const res = await fetch(`/api/document/${window.currentDocId}/paragraph/${idx}`, {
+      method: 'DELETE'
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Delete failed');
+    }
+
+    const data = await res.json();
+    window.docData = data;
+    document.getElementById('docParaCount').textContent = data.results.length;
+    renderReviewTable(data.results, data.paragraphs);
+    showToast('Paragraph deleted ✅', 'success');
+  } catch (e) {
+    showToast(e.message, 'error');
+  }
+}
+
+
+// ================================================================== //
+//  Bulk Delete Selected                                               //
+// ================================================================== //
+
+document.getElementById('deleteSelectedBtn')?.addEventListener('click', async () => {
+  const checkedBoxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
+  if (checkedBoxes.length === 0) return;
+
+  const indices = checkedBoxes.map(cb => parseInt(cb.dataset.idx)).sort((a, b) => a - b);
+  const confirmed = await showConfirmModal(
+    '🗑️ Delete Selected Paragraphs',
+    `Delete ${indices.length} selected paragraph(s)?\n\nThey will be permanently removed and won't appear in the Excel export.`,
+    'Delete All', 'danger'
+  );
+  if (!confirmed) return;
+
+  showToast('Deleting paragraphs...', 'info');
+  disableTable(true);
+
+  try {
+    const res = await fetch(`/api/document/${window.currentDocId}/paragraphs/bulk-delete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ indices })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Bulk delete failed');
+    }
+
+    const data = await res.json();
+    window.docData = data;
+    document.getElementById('docParaCount').textContent = data.results.length;
+    renderReviewTable(data.results, data.paragraphs);
+
+    const btn = document.getElementById('deleteSelectedBtn');
+    if (btn) btn.style.display = 'none';
+    showToast(`${indices.length} paragraph(s) deleted ✅`, 'success');
   } catch (e) {
     showToast(e.message, 'error');
   } finally {

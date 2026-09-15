@@ -3,11 +3,10 @@ Prompt Templates
 =================
 System and user prompts for the regulatory document analysis chain.
 
-Ollama note: Local models vary widely in JSON schema adherence.
-The system prompt includes an explicit JSON output template to help
-smaller models (7B–13B) produce valid structured output even when
-tool-calling / function-calling is not fully supported.
-LangChain's with_structured_output() uses this as a fallback.
+Uses the Agent Skills pattern for progressive disclosure:
+- Base system prompt defines the task and output format
+- Domain-specific taxonomy (business units, themes, levels) is injected
+  dynamically from matched SKILL.md files via core.skill_loader
 """
 
 import json
@@ -18,16 +17,17 @@ _JSON_TEMPLATE = json.dumps({
     "para_type": "Action Para | Information Para | Future Effective | Product or Service Not Offered | One-Time Action | Event Based | Repealed | Subsumed",
     "has_effective_date": "Yes | No",
     "effective_date": "DD/MM/YYYY or null",
-    "business_unit": "Administration | Audit | Business Banking - Working Capital | Compliance - RRD | Finance - ALM | Finance - PAD | Finance - FAG | Human Resources | Information Technology | Legal | Operations | Risk Management | Treasury | Retail Banking | Corporate Banking | Customer Service | N/A",
-    "theme": "Monitoring | Process | Reporting | Governance | Risk Management | Customer Protection | Capital Adequacy | Anti-Money Laundering | Data Privacy | Licensing | N/A",
-    "control_object_name": "Risk | Communication | Process and Policy | Documentation | Audit Trail | Segregation of Duties | Access Control | Compliance Monitoring | N/A",
+    "business_unit": "<determined from activated skill context>",
+    "theme": "<determined from activated skill context>",
+    "control_object_name": "<determined from activated skill context>",
     "actionable": "<concise description of required action, or 'No action required'>",
-    "level_1": "Governance | Due Diligence | Risk Management | Compliance | Operations | Reporting | Customer Management | N/A",
-    "level_2": "Corporate Governance | Access Control | Regulatory Reporting | Internal Audit | Fraud Prevention | Credit Risk | Operational Risk | N/A",
-    "level_3": "Fit and Proper Criteria | Customer Communication | Board Composition | Loan Provisioning | KYC Requirements | Transaction Monitoring | Capital Buffer | N/A",
+    "level_1": "<determined from activated skill context>",
+    "level_2": "<determined from activated skill context>",
+    "level_3": "<determined from activated skill context>",
 }, indent=2)
 
-SYSTEM_PROMPT = f"""You are an expert regulatory compliance analyst with deep knowledge of banking regulations, financial services compliance, and regulatory circular interpretation.
+# ── Base system prompt (without hardcoded taxonomy) ──
+_BASE_SYSTEM_PROMPT = f"""You are an expert regulatory compliance analyst with deep knowledge of banking regulations, financial services compliance, and regulatory circular interpretation.
 
 Your task is to analyse individual paragraphs from regulatory documents (circulars, guidelines, directives) issued by regulators such as the RBI, SEBI, IRDAI, or similar bodies.
 
@@ -45,29 +45,19 @@ For each paragraph provided, you must extract and classify the following informa
 
 2. **Is Regulation Para Effective Date Provided (has_effective_date) & Regulation para Effective Date (effective_date)**: Determine if the paragraph mentions an effective date, applicability date, or implementation deadline. If yes, extract the date in DD/MM/YYYY format. Set effective_date to null if none found.
 
-3. **Business Unit (business_unit)**: Identify which business unit within a financial institution is most impacted. Choose the closest match from:
-   Administration, Audit, Business Banking - Working Capital, Compliance - RRD,
-   Finance - ALM, Finance - PAD, Finance - FAG, Human Resources,
-   Information Technology, Corporate Legal, Operations, Risk Management,
-   Treasury, Retail Branch Banking- Retail Forex, Retail Agri, Corporate Banking
+3. **Business Unit (business_unit)**: Identify which business unit within a financial institution is most impacted. Use the classification values provided in the activated skill context below.
 
-4. **Theme (theme)**: Identify the overarching regulatory theme.
-   Examples: Assessment, Automation, Customer Communication, Customer Loan Documentation, Declaration, Definition, Disclosure, External Communication(other than customer), Governance, Information, Internal Communication, Internal Communication(within bank, staff, branches), Monitoring, Notification, Policy, Process, Storage and record keeping, System configuration, Themes/ Other Attibutes, Verification
+4. **Theme (theme)**: Identify the overarching regulatory theme. Use the classification values provided in the activated skill context below.
 
-5. **Control Objective Name (control_object_name)**: Identify the control objective.
-   Examples: Risk, Communication, Process and Policy, Documentation, Audit Trail, Segregation of Duties, Access Control, Compliance Monitoring
+5. **Control Objective Name (control_object_name)**: Identify the control objective. Use the classification values provided in the activated skill context below.
 
 6. **Actionable (actionable)**: A concise description of the action required. If purely informational, state "No action required".
 
-7. **Level 1 (level_1)**: Top-level taxonomy.
-   Examples: Communication and Conduct, Governance, Information Technology and Cyber Security,  Due Diligence, Information Technology and Cyber Security, Physical Non IT assests and Safety Controls(admin), Reconciliation(other than Physical Asset), Reporting and Disclosure, Third Party Controls, Training and Employee Code of Conduct, Transaction Controls and Monitoring 
+7. **Level 1 (level_1)**: Top-level taxonomy. Use the classification values provided in the activated skill context below.
 
+8. **Level 2 (level_2)**: Second-level taxonomy. Use the classification values provided in the activated skill context below.
 
-8. **Level 2 (level_2)**: Second-level taxonomy.
-   Examples: Corporate Governance, Access Control, Regulatory Reporting, Internal Audit, Fraud Prevention, Credit Risk, Operational Risk
-
-9. **Level 3 (level_3)**: Third-level (most specific) taxonomy.
-   Examples: Fit and Proper Criteria, Customer Communication, Board Composition, Loan Provisioning, KYC Requirements, Transaction Monitoring, Capital Buffer
+9. **Level 3 (level_3)**: Third-level (most specific) taxonomy. Use the classification values provided in the activated skill context below.
 
 IMPORTANT RULES:
 - Be precise and consistent in your classifications.
@@ -77,9 +67,19 @@ IMPORTANT RULES:
 - If a paragraph is too short or lacks meaningful regulatory content (e.g. "Dear Sir/Madam"), classify it as "Information Para" with "No action required".
 - If a paragraph is a document title, table of contents, header, footer, or other structural/non-regulatory text, classify it as "Information Para", set actionable to "Not Applicable", and set business_unit and taxonomies to "N/A".
 
+## Tool Calling Instructions
+You MUST review the "Available classification domains (skills)" below. 
+If the paragraph relates to one of these domains, you MUST call the `read_skill` tool with the exact name of the domain to learn its taxonomy and see few-shot examples. 
+If no domain fits, classify it generally without calling the tool.
+
+{{discovery_summary}}
+
 OUTPUT FORMAT — You MUST respond with ONLY valid JSON matching this exact structure, with no additional text, explanation, or markdown fences:
 
 {_JSON_TEMPLATE}"""
+
+# ── Legacy SYSTEM_PROMPT kept for backward compatibility with get_default_system_prompt() ──
+SYSTEM_PROMPT = _BASE_SYSTEM_PROMPT.replace("{discovery_summary}", "")
 
 
 # ── Default user prompt template (used when no DB override exists) ──
@@ -93,11 +93,19 @@ _DEFAULT_USER_PROMPT_TEMPLATE = (
 )
 
 
-def get_system_prompt() -> str:
+def get_system_prompt(discovery_summary: str = "") -> str:
     """Return the system prompt — DB override if admin has set one, else code default."""
     from services.database import get_db_prompt
     db_prompt = get_db_prompt("system")
-    return db_prompt if db_prompt else SYSTEM_PROMPT
+    
+    if db_prompt:
+        if "{discovery_summary}" in db_prompt:
+            return db_prompt.replace("{discovery_summary}", discovery_summary)
+        else:
+            return db_prompt + "\n\n" + discovery_summary
+    else:
+        from core.prompts import _BASE_SYSTEM_PROMPT
+        return _BASE_SYSTEM_PROMPT.replace("{discovery_summary}", discovery_summary)
 
 
 def get_default_system_prompt() -> str:

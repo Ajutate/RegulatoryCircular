@@ -589,6 +589,24 @@ async def api_delete_paragraph(doc_id: str, idx: int):
         raise HTTPException(status_code=400, detail="Delete failed. Check paragraph index.")
     return await get_document_results(doc_id)
 
+@app.post("/api/document/{doc_id}/paragraphs/bulk-delete")
+async def api_bulk_delete_paragraphs(doc_id: str, body: dict):
+    """Delete multiple paragraphs at once. Accepts { indices: [0, 2, 5] }."""
+    indices = body.get("indices", [])
+    if not indices:
+        raise HTTPException(status_code=400, detail="indices list is required.")
+
+    # Delete in reverse order so earlier indices stay valid
+    for idx in sorted(indices, reverse=True):
+        ok = delete_paragraph(doc_id, int(idx))
+        if not ok:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Bulk delete failed at paragraph index {idx}."
+            )
+
+    return await get_document_results(doc_id)
+
 @app.post("/api/document/{doc_id}/paragraph/{idx}/regenerate")
 async def regenerate_paragraph(doc_id: str, idx: int):
     """Regenerate analysis for a single paragraph via LLM."""
