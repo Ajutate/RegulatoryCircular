@@ -40,6 +40,12 @@ model_list:
     litellm_params:
       model: ollama/llama3.2
       api_base: http://localhost:11434
+  
+    # ── qwen2.5:14b  ──
+  - model_name: ollama/qwen2.5:14b 
+    litellm_params:
+      model: ollama/qwen2.5:14b 
+      api_base: http://localhost:11434
 
 # ── Proxy server settings ──
 litellm_settings:

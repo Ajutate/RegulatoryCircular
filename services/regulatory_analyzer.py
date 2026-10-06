@@ -53,12 +53,12 @@ class RegulatoryAnalyzer:
         if the model doesn't support tool-calling (common with Ollama models).
         """
         from langchain.agents import create_agent
-        from core.skill_loader import build_discovery_summary, read_skill
+        from core.prompts import get_user_prompt, get_system_prompt
+        from core.middleware import SkillMiddleware
 
-        discovery_summary = build_discovery_summary()
-        system_prompt = get_system_prompt(discovery_summary)
-
+        system_prompt = get_system_prompt("")
         user_prompt = get_user_prompt(paragraph, paragraph_number, total_paragraphs)
+        
         logger.info(f"User Prompt:: {user_prompt}")
         logger.info(f"\n\nSystem Prompt:: {system_prompt}")
         messages = [
@@ -68,24 +68,31 @@ class RegulatoryAnalyzer:
 
         logger.debug(f"Analyzing paragraph {paragraph_number}/{total_paragraphs} using Agent Loop...")
         
-        agent = create_agent(model=self._llm, tools=[read_skill])
+        from langchain_core.callbacks import BaseCallbackHandler
+        class LLMPromptLogger(BaseCallbackHandler):
+            def on_chat_model_start(self, serialized, messages, **kwargs):
+                # This will print the full list of messages sent to the LLM
+                # including the SystemPrompt, UserPrompt, and Tool responses!
+                formatted_prompt = "\\n\\n=== FULL PROMPT SENT TO LLM ===\\n"
+                for msg_list in messages:
+                    for m in msg_list:
+                        formatted_prompt += f"\\n--- [Role: {m.type.upper()}] ---\\n"
+                        if getattr(m, 'tool_calls', []):
+                            formatted_prompt += f"TOOL CALLS: {m.tool_calls}\\n"
+                        if getattr(m, 'tool_call_id', None):
+                            formatted_prompt += f"TOOL CALL ID: {m.tool_call_id}\\n"
+                        formatted_prompt += f"{str(m.content)}\\n"
+                formatted_prompt += "=================================\\n\\n"
+                logger.info(f"formatted_prompt :: {formatted_prompt}")
+
+        agent = create_agent(model=self._llm, middleware=[SkillMiddleware()])
         
         try:
-            result_state = agent.invoke({"messages": messages})
+            result_state = agent.invoke(
+                {"messages": messages}, 
+                config={"callbacks": [LLMPromptLogger()]}
+            )
             
-            # Log which skills the agent decided to use
-            used_skills = []
-            for msg in result_state["messages"]:
-                if hasattr(msg, "tool_calls") and msg.tool_calls:
-                    for tc in msg.tool_calls:
-                        if tc["name"] == "read_skill":
-                            used_skills.append(tc.get("args", {}).get("skill_name"))
-            
-            if used_skills:
-                logger.info(f"Agent dynamically loaded skills for paragraph {paragraph_number}: {', '.join(str(s) for s in used_skills)}")
-            else:
-                logger.info(f"Agent classified paragraph {paragraph_number} generally without loading extra skills.")
-
             final_content = result_state["messages"][-1].content
             logger.info(f"Successfully analyzed paragraph {paragraph_number}/{total_paragraphs}")
             return self._parse_json_response(final_content, paragraph)

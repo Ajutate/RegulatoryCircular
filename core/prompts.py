@@ -31,6 +31,13 @@ _BASE_SYSTEM_PROMPT = f"""You are an expert regulatory compliance analyst with d
 
 Your task is to analyse individual paragraphs from regulatory documents (circulars, guidelines, directives) issued by regulators such as the RBI, SEBI, IRDAI, or similar bodies.
 
+To accurately classify the business unit, theme, control objective, and level taxonomies, you have access to a `read_skill` tool.
+
+AGENT WORKFLOW:
+1. Read the paragraph and check the "Available Skills" listed at the end of this prompt.
+2. If the paragraph relates to one of the skills, you MUST call the `read_skill` tool with the skill's name to learn the specific classification values.
+3. After reading the skill (or if no skill applies), proceed to generate your final analysis.
+
 For each paragraph provided, you must extract and classify the following information:
 
 1. **Paragraph Type (para_type)**: Classify the paragraph as one of:
@@ -45,19 +52,19 @@ For each paragraph provided, you must extract and classify the following informa
 
 2. **Is Regulation Para Effective Date Provided (has_effective_date) & Regulation para Effective Date (effective_date)**: Determine if the paragraph mentions an effective date, applicability date, or implementation deadline. If yes, extract the date in DD/MM/YYYY format. Set effective_date to null if none found.
 
-3. **Business Unit (business_unit)**: Identify which business unit within a financial institution is most impacted. Use the classification values provided in the activated skill context below.
+3. **Business Unit (business_unit)**: Identify which business unit within a financial institution is most impacted. Use the classification values provided in the activated skill context.
 
-4. **Theme (theme)**: Identify the overarching regulatory theme. Use the classification values provided in the activated skill context below.
+4. **Theme (theme)**: Identify the overarching regulatory theme. Use the classification values provided in the activated skill context.
 
-5. **Control Objective Name (control_object_name)**: Identify the control objective. Use the classification values provided in the activated skill context below.
+5. **Control Objective Name (control_object_name)**: Identify the control objective. Use the classification values provided in the activated skill context.
 
 6. **Actionable (actionable)**: A concise description of the action required. If purely informational, state "No action required".
 
-7. **Level 1 (level_1)**: Top-level taxonomy. Use the classification values provided in the activated skill context below.
+7. **Level 1 (level_1)**: Top-level taxonomy. Use the classification values provided in the activated skill context.
 
-8. **Level 2 (level_2)**: Second-level taxonomy. Use the classification values provided in the activated skill context below.
+8. **Level 2 (level_2)**: Second-level taxonomy. Use the classification values provided in the activated skill context.
 
-9. **Level 3 (level_3)**: Third-level (most specific) taxonomy. Use the classification values provided in the activated skill context below.
+9. **Level 3 (level_3)**: Third-level (most specific) taxonomy. Use the classification values provided in the activated skill context.
 
 IMPORTANT RULES:
 - Be precise and consistent in your classifications.
@@ -67,19 +74,12 @@ IMPORTANT RULES:
 - If a paragraph is too short or lacks meaningful regulatory content (e.g. "Dear Sir/Madam"), classify it as "Information Para" with "No action required".
 - If a paragraph is a document title, table of contents, header, footer, or other structural/non-regulatory text, classify it as "Information Para", set actionable to "Not Applicable", and set business_unit and taxonomies to "N/A".
 
-## Tool Calling Instructions
-You MUST review the "Available classification domains (skills)" below. 
-If the paragraph relates to one of these domains, you MUST call the `read_skill` tool with the exact name of the domain to learn its taxonomy and see few-shot examples. 
-If no domain fits, classify it generally without calling the tool.
-
-{{discovery_summary}}
-
-OUTPUT FORMAT — You MUST respond with ONLY valid JSON matching this exact structure, with no additional text, explanation, or markdown fences:
+OUTPUT FORMAT — Once you have gathered the necessary context via tools, your FINAL response MUST be ONLY valid JSON matching this exact structure, with no additional text, explanation, or markdown fences:
 
 {_JSON_TEMPLATE}"""
 
 # ── Legacy SYSTEM_PROMPT kept for backward compatibility with get_default_system_prompt() ──
-SYSTEM_PROMPT = _BASE_SYSTEM_PROMPT.replace("{discovery_summary}", "")
+SYSTEM_PROMPT = _BASE_SYSTEM_PROMPT
 
 
 # ── Default user prompt template (used when no DB override exists) ──
@@ -89,7 +89,7 @@ _DEFAULT_USER_PROMPT_TEMPLATE = (
     "--- BEGIN PARAGRAPH ---\n"
     "{paragraph}\n"
     "--- END PARAGRAPH ---\n\n"
-    "Respond with ONLY the JSON object. No explanation, no markdown, no extra text."
+    "Remember to call the read_skill tool FIRST if a skill applies. Once you have the skill context, respond with ONLY the final JSON object. No markdown fences."
 )
 
 
@@ -105,7 +105,9 @@ def get_system_prompt(discovery_summary: str = "") -> str:
             return db_prompt + "\n\n" + discovery_summary
     else:
         from core.prompts import _BASE_SYSTEM_PROMPT
-        return _BASE_SYSTEM_PROMPT.replace("{discovery_summary}", discovery_summary)
+        if "{discovery_summary}" in _BASE_SYSTEM_PROMPT:
+            return _BASE_SYSTEM_PROMPT.replace("{discovery_summary}", discovery_summary)
+        return _BASE_SYSTEM_PROMPT + ("\n\n" + discovery_summary if discovery_summary else "")
 
 
 def get_default_system_prompt() -> str:
