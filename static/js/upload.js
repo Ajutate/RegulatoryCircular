@@ -93,6 +93,7 @@ async function handleFile(file) {
     // Store in localStorage
     State.set(STATE_KEYS.DOC_META, {
       file_name:  data.file_name,
+      circular_name: data.circular_name || data.file_name,
       file_size_kb: data.file_size_kb,
       format:     data.format,
       page_count: data.page_count,
@@ -128,7 +129,7 @@ function renderResults(meta, paragraphs) {
     `Document extracted successfully — ${paragraphs.length} paragraphs ready. Review them below before starting the AI analysis.`;
 
   // Metrics
-  document.getElementById('metaName').textContent   = meta.file_name;
+  document.getElementById('metaName').textContent   = meta.circular_name || meta.file_name;
   document.getElementById('metaFormat').textContent = meta.format;
   document.getElementById('metaSize').textContent   = fmtSize(meta.file_size_kb);
   document.getElementById('metaParas').textContent  = paragraphs.length;
@@ -173,7 +174,7 @@ async function handleSaveExtracted(analyzeNow) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        document_name: meta.file_name,
+        document_name: meta.circular_name || meta.file_name,
         user_id: user.id,
         paragraphs: paras
       })

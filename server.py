@@ -221,8 +221,19 @@ async def upload_document(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=422, detail=f"Paragraph splitting failed: {e}")
 
+    # Determine circular name from document content
+    circular_name = meta["file_name"]
+    if paragraphs:
+        for p in paragraphs:
+            if p.startswith("#"):
+                circular_name = p.lstrip("#* \t")
+                break
+        if circular_name == meta["file_name"] and len(paragraphs[0]) < 150:
+            circular_name = paragraphs[0]
+
     return {
         "file_name": meta["file_name"],
+        "circular_name": circular_name,
         "file_size_kb": meta["file_size_kb"],
         "format": meta["format"],
         "page_count": meta["page_count"],

@@ -51,8 +51,10 @@ function renderPreAnalysisTable() {
 
   function toggleMergeBtn() {
     const checked = document.querySelectorAll('.row-checkbox:checked').length;
-    const btn = document.getElementById('mergeSelectedBtn');
-    if (btn) btn.style.display = checked > 1 ? 'inline-block' : 'none';
+    const mergeBtn = document.getElementById('mergeSelectedBtn');
+    const deleteBtn = document.getElementById('deleteSelectedBtn');
+    if (mergeBtn) mergeBtn.style.display = checked > 1 ? 'inline-block' : 'none';
+    if (deleteBtn) deleteBtn.style.display = checked > 0 ? 'inline-block' : 'none';
   }
 
   if (!tbody.dataset.dndInitialized) {
@@ -271,8 +273,47 @@ document.getElementById('mergeSelectedBtn')?.addEventListener('click', async () 
   State.set(STATE_KEYS.PARAGRAPHS, paras);
   renderPreAnalysisTable();
   
-  const btn = document.getElementById('mergeSelectedBtn');
-  if (btn) btn.style.display = 'none';
+  const mergeBtn = document.getElementById('mergeSelectedBtn');
+  const deleteBtn = document.getElementById('deleteSelectedBtn');
+  const selectAll = document.getElementById('selectAllPreAnalysis');
+  if (mergeBtn) mergeBtn.style.display = 'none';
+  if (deleteBtn) deleteBtn.style.display = 'none';
+  if (selectAll) selectAll.checked = false;
+
   showToast('Paragraphs merged successfully.', 'success');
 });
 
+
+// ================================================================== //
+//  Bulk Delete Logic
+// ================================================================== //
+
+document.getElementById('deleteSelectedBtn')?.addEventListener('click', async () => {
+  const checkedBoxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
+  if (checkedBoxes.length === 0) return;
+
+  const confirmed = await showConfirmModal(
+    'Remove Selected Paragraphs', 
+    `Are you sure you want to remove the ${checkedBoxes.length} selected paragraph(s)? They will be excluded from AI analysis.`, 
+    'Remove All', 'danger'
+  );
+  if (!confirmed) return;
+
+  // Sort descending so splicing doesn't mess up subsequent indices
+  const indices = checkedBoxes.map(cb => parseInt(cb.dataset.idx)).sort((a, b) => b - a);
+  let paras = State.get(STATE_KEYS.PARAGRAPHS);
+  
+  indices.forEach(idx => paras.splice(idx, 1));
+  
+  State.set(STATE_KEYS.PARAGRAPHS, paras);
+  renderPreAnalysisTable();
+  
+  const mergeBtn = document.getElementById('mergeSelectedBtn');
+  const deleteBtn = document.getElementById('deleteSelectedBtn');
+  const selectAll = document.getElementById('selectAllPreAnalysis');
+  if (mergeBtn) mergeBtn.style.display = 'none';
+  if (deleteBtn) deleteBtn.style.display = 'none';
+  if (selectAll) selectAll.checked = false;
+
+  showToast(`${indices.length} paragraph(s) deleted.`, 'info');
+});

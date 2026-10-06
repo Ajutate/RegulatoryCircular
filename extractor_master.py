@@ -17,10 +17,19 @@ The rest of the application only depends on the ``extract()`` and
 
 import io
 import os
+import sys
 from typing import Any
 
-import pymupdf as fitz                          # PyMuPDF — modern import (fitz is deprecated)
+import fitz  # PyMuPDF
 from docx import Document as DocxDocument
+
+# Configure Tesseract path for Windows
+if sys.platform.startswith("win"):
+    tesseract_path = r"C:\Program Files\Tesseract-OCR"
+    if os.path.exists(tesseract_path):
+        os.environ["PATH"] += os.pathsep + tesseract_path
+        if "TESSDATA_PREFIX" not in os.environ:
+            os.environ["TESSDATA_PREFIX"] = os.path.join(tesseract_path, "tessdata")
 
 
 class DocumentExtractor:
@@ -54,7 +63,7 @@ class DocumentExtractor:
         Returns
         -------
         str
-            The extracted plain-text content of the document in Markdown format.
+            The extracted plain-text content of the document.
 
         Raises
         ------
@@ -102,7 +111,7 @@ class DocumentExtractor:
                 f"Please upload a .pdf or .docx file."
             )
 
- # ------------------------------------------------------------------ #
+    # ------------------------------------------------------------------ #
     #  PDF extraction (PyMuPDF)                                           #
     # ------------------------------------------------------------------ #
 
@@ -196,34 +205,63 @@ class DocumentExtractor:
 
     @staticmethod
     def _extract_docx(file_bytes: bytes) -> str:
-        """Extract text from all paragraphs of a DOCX file."""
+        """Extract text from all paragraphs and tables of a DOCX."""
         doc = DocxDocument(io.BytesIO(file_bytes))
-        # Keep empty paragraphs to preserve spacing (useful for chunking)
-        paragraphs = [para.text for para in doc.paragraphs]
-        return "\n".join(paragraphs)
+        parts: list[str] = []
+
+        # Extract paragraphs
+        for para in doc.paragraphs:
+            text = para.text.strip()
+            if text:
+                parts.append(text)
+
+        # Extract text from tables (row by row)
+        for table in doc.tables:
+            for row in table.rows:
+                row_text = " | ".join(cell.text.strip() for cell in row.cells if cell.text.strip())
+                if row_text:
+                    parts.append(row_text)
+
+        return "\n\n".join(parts)
 
     @staticmethod
     def _extract_docx_with_metadata(file_bytes: bytes, file_name: str) -> dict[str, Any]:
-        """Extract text and metadata from DOCX file."""
+        """Extract text and metadata from a DOCX."""
         doc = DocxDocument(io.BytesIO(file_bytes))
-        paragraphs = [para.text for para in doc.paragraphs]
-        text = "\n".join(paragraphs)
+        parts: list[str] = []
+        first_heading = ""
 
-        core_props = doc.core_properties
-        metadata = {
-            "author": core_props.author,
-            "created": core_props.created.isoformat() if core_props.created else None,
-            "modified": core_props.modified.isoformat() if core_props.modified else None,
-            "title": core_props.title,
-        }
+        for para in doc.paragraphs:
+            text = para.text.strip()
+            if text:
+                # If it's a heading style, or just the very first text we see
+                is_heading_style = para.style and ("Heading" in para.style.name or "Title" in para.style.name)
+                if not first_heading and is_heading_style:
+                    first_heading = text
+                elif not first_heading and len(parts) == 0:
+                    first_heading = text
+                parts.append(text)
 
+        for table in doc.tables:
+            for row in table.rows:
+                row_text = " | ".join(cell.text.strip() for cell in row.cells if cell.text.strip())
+                if row_text:
+                    parts.append(row_text)
+
+        core = doc.core_properties
         return {
-            "text": text,
+            "text": "\n\n".join(parts),
             "file_name": file_name,
-            "file_size_kb": round(len(file_bytes) / 1024, 2),
-            "page_count": None,  # Not applicable for DOCX natively
-            "format": "docx",
-            "metadata": metadata,
+            "file_size_kb": round(len(file_bytes) / 1024, 1),
+            "page_count": len(doc.sections),  # approximate via sections
+            "format": "DOCX",
+            "metadata": {
+                "title": core.title or "",
+                "author": core.author or "",
+                "subject": core.subject or "",
+                "created": str(core.created) if core.created else "",
+                "first_heading": first_heading,
+            },
         }
 
     # ------------------------------------------------------------------ #
@@ -232,6 +270,7 @@ class DocumentExtractor:
 
     @staticmethod
     def _get_extension(file_name: str) -> str:
-        """Safely extract and lower-case the file extension."""
-        _, ext = os.path.splitext(file_name)
-        return ext.lower()
+        """Return the lowercased file extension including the dot."""
+        if "." in file_name:
+            return "." + file_name.rsplit(".", 1)[-1].lower()
+        return ""

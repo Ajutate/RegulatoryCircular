@@ -646,8 +646,13 @@ document.getElementById('mergeSelectedBtn')?.addEventListener('click', async () 
     document.getElementById('docParaCount').textContent = data.results.length;
     renderReviewTable(data.results, data.paragraphs);
     
-    const btn = document.getElementById('mergeSelectedBtn');
-    if (btn) btn.style.display = 'none';
+    const mergeBtn = document.getElementById('mergeSelectedBtn');
+    const deleteBtn = document.getElementById('deleteSelectedBtn');
+    const selectAll = document.getElementById('selectAllMaker');
+    if (mergeBtn) mergeBtn.style.display = 'none';
+    if (deleteBtn) deleteBtn.style.display = 'none';
+    if (selectAll) selectAll.checked = false;
+
     showToast('Merge successful! Click Regenerate when ready.', 'success');
   } catch (e) {
     showToast(e.message, 'error');
@@ -727,8 +732,13 @@ document.getElementById('deleteSelectedBtn')?.addEventListener('click', async ()
     document.getElementById('docParaCount').textContent = data.results.length;
     renderReviewTable(data.results, data.paragraphs);
 
-    const btn = document.getElementById('deleteSelectedBtn');
-    if (btn) btn.style.display = 'none';
+    const mergeBtn = document.getElementById('mergeSelectedBtn');
+    const deleteBtn = document.getElementById('deleteSelectedBtn');
+    const selectAll = document.getElementById('selectAllMaker');
+    if (mergeBtn) mergeBtn.style.display = 'none';
+    if (deleteBtn) deleteBtn.style.display = 'none';
+    if (selectAll) selectAll.checked = false;
+
     showToast(`${indices.length} paragraph(s) deleted ✅`, 'success');
   } catch (e) {
     showToast(e.message, 'error');

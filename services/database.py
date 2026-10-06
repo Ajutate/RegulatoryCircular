@@ -568,7 +568,8 @@ def update_paragraph_result(doc_id: str, idx: int, result_json: dict) -> bool:
     try:
         para = db.query(Paragraph).filter(
             Paragraph.document_id == doc_id,
-            Paragraph.paragraph_index == idx
+            Paragraph.paragraph_index == idx,
+            Paragraph.is_deleted == False
         ).first()
         
         if not para:
@@ -682,7 +683,11 @@ def delete_paragraph(doc_id: str, idx: int) -> bool:
     try:
         para = (
             db.query(Paragraph)
-            .filter(Paragraph.document_id == doc_id, Paragraph.paragraph_index == idx)
+            .filter(
+                Paragraph.document_id == doc_id, 
+                Paragraph.paragraph_index == idx,
+                Paragraph.is_deleted == False
+            )
             .first()
         )
         if not para:
@@ -719,7 +724,11 @@ def merge_paragraphs(doc_id: str, indices: List[int]) -> Optional[Dict[str, Any]
     try:
         paras = (
             db.query(Paragraph)
-            .filter(Paragraph.document_id == doc_id, Paragraph.paragraph_index.in_(indices_sorted))
+            .filter(
+                Paragraph.document_id == doc_id, 
+                Paragraph.paragraph_index.in_(indices_sorted),
+                Paragraph.is_deleted == False
+            )
             .order_by(Paragraph.paragraph_index)
             .all()
         )
@@ -774,7 +783,11 @@ def split_paragraph(doc_id: str, idx: int, new_parts: List[str]) -> Optional[Lis
     try:
         para = (
             db.query(Paragraph)
-            .filter(Paragraph.document_id == doc_id, Paragraph.paragraph_index == idx)
+            .filter(
+                Paragraph.document_id == doc_id, 
+                Paragraph.paragraph_index == idx,
+                Paragraph.is_deleted == False
+            )
             .first()
         )
         if not para:
