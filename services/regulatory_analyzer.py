@@ -35,6 +35,7 @@ class RegulatoryAnalyzer:
 
     def __init__(self) -> None:
         self._llm = get_llm()
+        self._system_prompt = get_system_prompt()
 
     # ------------------------------------------------------------------ #
     #  Public API                                                         #
@@ -52,67 +53,37 @@ class RegulatoryAnalyzer:
         Tries with_structured_output() first; falls back to raw JSON parsing
         if the model doesn't support tool-calling (common with Ollama models).
         """
-        from langchain.agents import create_agent
-        from core.prompts import get_user_prompt, get_system_prompt
-        from core.middleware import SkillMiddleware
-
-        system_prompt = get_system_prompt("")
         user_prompt = get_user_prompt(paragraph, paragraph_number, total_paragraphs)
-        
         logger.info(f"User Prompt:: {user_prompt}")
-        logger.info(f"\n\nSystem Prompt:: {system_prompt}")
+        logger.info(f"\n\nSystem Prompt:: {self._system_prompt}")
         messages = [
-            SystemMessage(content=system_prompt),
+            SystemMessage(content=self._system_prompt),
             HumanMessage(content=user_prompt),
         ]
 
-        logger.debug(f"Analyzing paragraph {paragraph_number}/{total_paragraphs} using Agent Loop...")
-        
-        from langchain_core.callbacks import BaseCallbackHandler
-        class LLMPromptLogger(BaseCallbackHandler):
-            def on_chat_model_start(self, serialized, messages, **kwargs):
-                # This will print the full list of messages sent to the LLM
-                # including the SystemPrompt, UserPrompt, and Tool responses!
-                formatted_prompt = "\\n\\n=== FULL PROMPT SENT TO LLM ===\\n"
-                for msg_list in messages:
-                    for m in msg_list:
-                        formatted_prompt += f"\\n--- [Role: {m.type.upper()}] ---\\n"
-                        if getattr(m, 'tool_calls', []):
-                            formatted_prompt += f"TOOL CALLS: {m.tool_calls}\\n"
-                        if getattr(m, 'tool_call_id', None):
-                            formatted_prompt += f"TOOL CALL ID: {m.tool_call_id}\\n"
-                        formatted_prompt += f"{str(m.content)}\\n"
-                formatted_prompt += "=================================\\n\\n"
-                logger.info(f"formatted_prompt :: {formatted_prompt}")
-
-        agent = create_agent(model=self._llm, middleware=[SkillMiddleware()])
-        
+        logger.debug(f"Analyzing paragraph {paragraph_number}/{total_paragraphs} using LLM...")
+        # ── Primary path: structured output (tool-calling) ──
         try:
-            result_state = agent.invoke(
-                {"messages": messages}, 
-                config={"callbacks": [LLMPromptLogger()]}
+            structured_llm = self._llm.with_structured_output(
+                RegulatoryParagraphAnalysis
             )
-            
-            final_content = result_state["messages"][-1].content
-            logger.info(f"Successfully analyzed paragraph {paragraph_number}/{total_paragraphs}")
-            return self._parse_json_response(final_content, paragraph)
+            result = structured_llm.invoke(messages)
+            result.paragraph_text = paragraph  # always preserve original
+            logger.info(f"Successfully analyzed paragraph {paragraph_number}/{total_paragraphs} (Structured output)")
+            logger.info(f"Structured Result: {result.model_dump() if hasattr(result, 'model_dump') else result}")
+            return result
         except Exception as e:
-            logger.error(f"Agent analysis failed for paragraph {paragraph_number}/{total_paragraphs}: {e}")
+            logger.warning(f"Structured output failed for paragraph {paragraph_number}/{total_paragraphs}: {e}. Falling back to raw JSON.")
+            pass  # fall through to JSON parsing fallback
 
-            # Create a fallback analysis if everything fails
-            return RegulatoryParagraphAnalysis(
-                paragraph_text=paragraph,
-                para_type="Error",
-                has_effective_date="No",
-                effective_date=None,
-                business_unit="Unknown",
-                theme="Unknown",
-                control_object_name="Unknown",
-                actionable=f"Agent or parsing failed: {e}",
-                level_1="Unknown",
-                level_2="Unknown",
-                level_3="Unknown",
-            )
+        # ── Fallback path: raw LLM call + JSON extraction ──
+        logger.debug(f"Using fallback raw JSON extraction for paragraph {paragraph_number}/{total_paragraphs}")
+        raw = self._llm.invoke(messages)
+        raw_text = raw.content if hasattr(raw, "content") else str(raw)
+        result = self._parse_json_response(raw_text, paragraph)
+        logger.info(f"Successfully analyzed paragraph {paragraph_number}/{total_paragraphs} (Fallback path)")
+        logger.info(f"Fallback Result: {result.model_dump() if hasattr(result, 'model_dump') else result}")
+        return result
 
     def analyze_all(
         self,
