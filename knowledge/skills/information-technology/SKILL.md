@@ -1,12 +1,13 @@
 ---
-name: human-resources
+name: information-technology
 description: >
-  Primary Business Unit: Human Resources.
-  Human resources policies, employee conduct, training requirements,
-  staff accountability, compensation, and workforce management.
-  Use when the paragraph mentions employee, staff, training, HR policy,
-  compensation, code of conduct, disciplinary, workforce, recruitment,
-  staff accountability, or employee benefits.
+  Primary Business Unit: Information Technology.
+  Information technology governance, cybersecurity frameworks, IT audit,
+  data privacy, information security, and digital banking guidelines.
+  Use when the paragraph mentions IT policy, cybersecurity, information
+  security, data protection, CISO, IT audit, digital banking, internet
+  banking, mobile banking, phishing, cyber attack, or data breach.
+  Also covers data privacy and digital banking.
 ---
 
 ## Classification Values
@@ -14,29 +15,35 @@ description: >
 ### Business Unit
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Human Resources
+- Information Technology — IT systems and infrastructure
+- Information Security Group — cybersecurity, CISO, VAPT
+- Compliance-IT — IT compliance
+- Compliance-ISG — information security compliance
+- Risk-IT and Digital Risk Management — IT and digital risk
+- Data Privacy Office — data privacy and protection
+- Digital Banking — internet/mobile banking
 
 ### Themes
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Policy — documented or board-approved policy requirement
-- Process — procedure or process steps to be followed
 - Governance — board/committee oversight and accountability
-- Assessment — risk/eligibility/impact assessment
-- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
-- Declaration — declarations or undertakings to be given or obtained
 - Monitoring — ongoing monitoring, review, surveillance
-- Disclosure — public or customer disclosure of information
+- System configuration — system parameters, limits or configuration
+- Policy — documented or board-approved policy requirement
+- Assessment — risk/eligibility/impact assessment
 - Automation — automated processing or system-driven control
+- Process — procedure or process steps to be followed
+- Storage and records keeping — retention and maintenance of records
 - Customer Communication — communication to customers
 - Customer Loan Documentation — loan agreements, sanction letters, loan documents
+- Declaration — declarations or undertakings to be given or obtained
 - Definition — paragraph defines a term or scope
+- Disclosure — public or customer disclosure of information
 - External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
 - Information — purely informational or background text
 - Internal Communication — communication within the organisation
+- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
 - Notification — intimating a party of an event or change
-- Storage and records keeping — retention and maintenance of records
-- System configuration — system parameters, limits or configuration
 - Themes/ Other Attributes — only when no other theme applies
 - Verification — verification/validation of documents, identity or data
 
@@ -235,27 +242,27 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 | Transaction Controls & Monitoring | Transaction Controls | Validation Rules |
 
 ### Control Objectives
+- Access Control
 - Process and Policy
-- Documentation
-- Communication
-- Segregation of Duties
+- Risk
+- Compliance Monitoring
 
 ## Few-Shot Examples
 
 ### Example 1
-**Paragraph**: "Banks shall ensure that all staff handling customer transactions undergo mandatory training on AML/CFT procedures at least once a year."
+**Paragraph**: "Banks shall appoint a Chief Information Security Officer (CISO) at a senior management level who shall be responsible for implementing the cybersecurity policy."
 
 **Classification**:
 - para_type: "Action Para"
 - has_effective_date: "No"
 - effective_date: null
-- business_unit: "Human Resources"
-- theme: "Process"
+- business_unit: "Information Security Group"
+- theme: "Governance"
 - control_object_name: "Process and Policy"
 - level_1: "Information Technology & Cyber Security"
 - level_2: "Operations Management"
 - level_3: "Exception Handling"
-- actionable: "Conduct mandatory annual AML/CFT training for all customer-facing staff"
+- actionable: "Appoint CISO at senior management level responsible for cybersecurity policy implementation"
 
 ### Example 2
 **Paragraph**: "The revised instructions and system requirements shall take effect from October 01, 2025. All entities shall ensure necessary operational readiness before October 01, 2025."
@@ -264,7 +271,7 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 - para_type: "Future Effective"
 - has_effective_date: "Yes"
 - effective_date: "01/10/2025"
-- business_unit: "Human Resources"
+- business_unit: "Information Technology"
 - theme: "Process"
 - control_object_name: "Process and Policy"
 - level_1: "Governance"

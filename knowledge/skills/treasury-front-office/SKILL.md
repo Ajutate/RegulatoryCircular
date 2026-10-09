@@ -1,12 +1,13 @@
 ---
-name: human-resources
+name: treasury-front-office
 description: >
-  Primary Business Unit: Human Resources.
-  Human resources policies, employee conduct, training requirements,
-  staff accountability, compensation, and workforce management.
-  Use when the paragraph mentions employee, staff, training, HR policy,
-  compensation, code of conduct, disciplinary, workforce, recruitment,
-  staff accountability, or employee benefits.
+  Primary Business Unit: Treasury-Front Office.
+  Treasury management, investment portfolio, SLR/CRR maintenance,
+  ALM (Asset Liability Management), interest rate management, and
+  capital adequacy. Use when the paragraph mentions treasury, SLR,
+  CRR, investment, capital adequacy, CRAR, Basel, capital buffer,
+  ALM, interest rate, liquidity, or reserve requirements.
+  Also covers treasury trading, back office and bullion.
 ---
 
 ## Classification Values
@@ -14,26 +15,37 @@ description: >
 ### Business Unit
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Human Resources
+- Treasury-Front Office — investment/trading
+- Finance-ALM — asset-liability management and capital adequacy
+- Treasury-Balance Sheet — SLR/CRR maintenance
+- Treasury-Trading
+- Treasury-TAG
+- Treasury-Forex IB
+- Treasury-Institutional Sales
+- Treasury-Analytics
+- Treasury-Bullion
+- Treasury-Overseas Business
+- Finance-Treasury
+- Operations-Treasury Back Office — treasury settlement and back office
 
 ### Themes
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Policy — documented or board-approved policy requirement
 - Process — procedure or process steps to be followed
-- Governance — board/committee oversight and accountability
-- Assessment — risk/eligibility/impact assessment
-- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
-- Declaration — declarations or undertakings to be given or obtained
 - Monitoring — ongoing monitoring, review, surveillance
+- Governance — board/committee oversight and accountability
+- Policy — documented or board-approved policy requirement
 - Disclosure — public or customer disclosure of information
+- Assessment — risk/eligibility/impact assessment
+- External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
 - Automation — automated processing or system-driven control
 - Customer Communication — communication to customers
 - Customer Loan Documentation — loan agreements, sanction letters, loan documents
+- Declaration — declarations or undertakings to be given or obtained
 - Definition — paragraph defines a term or scope
-- External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
 - Information — purely informational or background text
 - Internal Communication — communication within the organisation
+- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
 - Notification — intimating a party of an event or change
 - Storage and records keeping — retention and maintenance of records
 - System configuration — system parameters, limits or configuration
@@ -235,27 +247,27 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 | Transaction Controls & Monitoring | Transaction Controls | Validation Rules |
 
 ### Control Objectives
+- Risk
 - Process and Policy
+- Compliance Monitoring
 - Documentation
-- Communication
-- Segregation of Duties
 
 ## Few-Shot Examples
 
 ### Example 1
-**Paragraph**: "Banks shall ensure that all staff handling customer transactions undergo mandatory training on AML/CFT procedures at least once a year."
+**Paragraph**: "Banks shall maintain a minimum Capital to Risk-weighted Assets Ratio (CRAR) of 9% on an ongoing basis, with at least 7% in the form of Common Equity Tier 1 (CET1) capital."
 
 **Classification**:
 - para_type: "Action Para"
 - has_effective_date: "No"
 - effective_date: null
-- business_unit: "Human Resources"
+- business_unit: "Finance-ALM"
 - theme: "Process"
-- control_object_name: "Process and Policy"
+- control_object_name: "Compliance Monitoring"
 - level_1: "Information Technology & Cyber Security"
 - level_2: "Operations Management"
 - level_3: "Exception Handling"
-- actionable: "Conduct mandatory annual AML/CFT training for all customer-facing staff"
+- actionable: "Maintain minimum CRAR of 9% with at least 7% CET1 capital on ongoing basis"
 
 ### Example 2
 **Paragraph**: "The revised instructions and system requirements shall take effect from October 01, 2025. All entities shall ensure necessary operational readiness before October 01, 2025."
@@ -264,7 +276,7 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 - para_type: "Future Effective"
 - has_effective_date: "Yes"
 - effective_date: "01/10/2025"
-- business_unit: "Human Resources"
+- business_unit: "Treasury Front Office"
 - theme: "Process"
 - control_object_name: "Process and Policy"
 - level_1: "Governance"

@@ -1,12 +1,13 @@
 ---
-name: human-resources
+name: risk-enterprise-risk-management
 description: >
-  Primary Business Unit: Human Resources.
-  Human resources policies, employee conduct, training requirements,
-  staff accountability, compensation, and workforce management.
-  Use when the paragraph mentions employee, staff, training, HR policy,
-  compensation, code of conduct, disciplinary, workforce, recruitment,
-  staff accountability, or employee benefits.
+  Primary Business Unit: Risk-Enterprise Risk Management.
+  Enterprise risk management frameworks including credit risk, market risk,
+  operational risk, liquidity risk, ICAAP, stress testing, and risk appetite.
+  Use when the paragraph mentions risk assessment, risk policy, credit risk,
+  market risk, operational risk, liquidity risk, ICAAP, stress testing,
+  risk appetite, risk framework, or risk management committee.
+  Also covers BCM, outsourcing risk, model validation and early warning signals.
 ---
 
 ## Classification Values
@@ -14,26 +15,43 @@ description: >
 ### Business Unit
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Human Resources
+- Risk-Enterprise Risk Management — enterprise-wide risk frameworks
+- Risk-Wholesale Credit Risk Management — wholesale credit risk
+- Risk-Market Risk — market risk
+- Risk-Operational — operational risk
+- Risk-ICAAP — ICAAP and stress testing
+- Risk-II Risk Management
+- Risk-Treasury Mid Office
+- Risk-SME Credit Risk Management
+- Risk-Retail Credit Risk Management.
+- Risk-Credit Middle Ottice
+- Risk-BCM — business continuity management
+- Risk-Outsourcing — outsourcing risk
+- Risk-Model Validation Unit — model validation
+- Risk-Early Warning Signal Team — early warning signals
+- Risk-Product Control Unit
+- Risk-Group Risk
+- Risk-Credit Portfolio Risk Analytics
+- Risk-Ratings Team — internal ratings
 
 ### Themes
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Policy — documented or board-approved policy requirement
-- Process — procedure or process steps to be followed
 - Governance — board/committee oversight and accountability
 - Assessment — risk/eligibility/impact assessment
-- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
-- Declaration — declarations or undertakings to be given or obtained
+- Policy — documented or board-approved policy requirement
 - Monitoring — ongoing monitoring, review, surveillance
+- Process — procedure or process steps to be followed
 - Disclosure — public or customer disclosure of information
+- External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
 - Automation — automated processing or system-driven control
 - Customer Communication — communication to customers
 - Customer Loan Documentation — loan agreements, sanction letters, loan documents
+- Declaration — declarations or undertakings to be given or obtained
 - Definition — paragraph defines a term or scope
-- External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
 - Information — purely informational or background text
 - Internal Communication — communication within the organisation
+- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
 - Notification — intimating a party of an event or change
 - Storage and records keeping — retention and maintenance of records
 - System configuration — system parameters, limits or configuration
@@ -235,27 +253,27 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 | Transaction Controls & Monitoring | Transaction Controls | Validation Rules |
 
 ### Control Objectives
+- Risk
 - Process and Policy
+- Compliance Monitoring
 - Documentation
-- Communication
-- Segregation of Duties
 
 ## Few-Shot Examples
 
 ### Example 1
-**Paragraph**: "Banks shall ensure that all staff handling customer transactions undergo mandatory training on AML/CFT procedures at least once a year."
+**Paragraph**: "Banks shall put in place a Board-approved policy for management of credit concentration risk, covering both on-balance sheet and off-balance sheet exposures."
 
 **Classification**:
 - para_type: "Action Para"
 - has_effective_date: "No"
 - effective_date: null
-- business_unit: "Human Resources"
-- theme: "Process"
+- business_unit: "Risk-Wholesale Credit Risk Management"
+- theme: "Governance"
 - control_object_name: "Process and Policy"
 - level_1: "Information Technology & Cyber Security"
 - level_2: "Operations Management"
 - level_3: "Exception Handling"
-- actionable: "Conduct mandatory annual AML/CFT training for all customer-facing staff"
+- actionable: "Establish Board-approved policy for credit concentration risk covering on and off-balance sheet exposures"
 
 ### Example 2
 **Paragraph**: "The revised instructions and system requirements shall take effect from October 01, 2025. All entities shall ensure necessary operational readiness before October 01, 2025."
@@ -264,7 +282,7 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 - para_type: "Future Effective"
 - has_effective_date: "Yes"
 - effective_date: "01/10/2025"
-- business_unit: "Human Resources"
+- business_unit: "Risk Enterprise Risk Management"
 - theme: "Process"
 - control_object_name: "Process and Policy"
 - level_1: "Governance"

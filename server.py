@@ -301,19 +301,11 @@ async def run_analysis_job(session_id: str):
             })
 
         if store["status"] == "running":
-            # Apply document-level effective date logic
-            unique_dates = set()
-            for r in store["results"]:
-                d = r.get("effective_date")
-                if d and isinstance(d, str) and d.strip().lower() not in ("", "null", "none", "n/a"):
-                    unique_dates.add(d.strip())
-            
-            if len(unique_dates) == 1:
-                global_date = unique_dates.pop()
-                logger.info(f"Found exactly one unique effective date '{global_date}'. Applying to all paragraphs.")
-                for r in store["results"]:
-                    r["has_effective_date"] = "Yes"
-                    r["effective_date"] = global_date
+            # Apply document-level effective date logic: if found in any para, apply to all
+            from core.date_utils import harmonize_document_effective_dates
+            _, applied_date = harmonize_document_effective_dates(store["results"])
+            if applied_date:
+                logger.info(f"Applied document effective date '{applied_date}' across all paragraphs.")
 
             logger.info(f"Background analysis job {session_id} completed successfully")
             store["status"] = "complete"
@@ -645,13 +637,14 @@ async def regenerate_paragraph(doc_id: str, idx: int):
         # Determine if it's skipped
         is_skipped = (result_dict.get("para_type") == "Information Para" and result_dict.get("actionable") == "Not Applicable")
         
-        # Preserve date fields from the existing result
+        # If newly regenerated result has no date but existing result had a valid date, keep existing
         if doc.get("analysis_results_json"):
             existing_results = json.loads(doc["analysis_results_json"])
             if 0 <= idx < len(existing_results):
                 existing_result = existing_results[idx]
-                result_dict["has_effective_date"] = existing_result.get("has_effective_date", result_dict.get("has_effective_date"))
-                result_dict["effective_date"] = existing_result.get("effective_date", result_dict.get("effective_date"))
+                if not result_dict.get("effective_date") and existing_result.get("effective_date"):
+                    result_dict["has_effective_date"] = existing_result.get("has_effective_date", "Yes")
+                    result_dict["effective_date"] = existing_result.get("effective_date")
 
         # Update the database and clear needs_regeneration flag
         result_dict["needs_regeneration"] = False

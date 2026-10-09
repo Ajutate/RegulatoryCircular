@@ -281,6 +281,7 @@ async function handleComplete(results) {
   isRunning = false;
   State.set(STATE_KEYS.RESULTS, results);
   collectedResults = results;
+  renderLiveTable(results);
   progressSection.style.display = 'none';
   showCompleteBanner(results);
   updateSidebarStatus();

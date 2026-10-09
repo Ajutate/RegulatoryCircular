@@ -1,180 +1,113 @@
 # Auto-generated skill index for progressive disclosure (Stage 1: Discovery)
-# Only name, description, and keywords are loaded at startup.
-# Full SKILL.md content is loaded on-demand when a paragraph matches.
-#
 # To regenerate: python -m core.skill_loader --rebuild-index
 
 skills:
-  - name: forex-retail-banking
-    description: "Retail foreign exchange operations including LRS, authorised dealer categories, forex transactions, remittance limits, and FEMA compliance."
-    keywords:
-      - forex
-      - lrs
-      - remittance
-      - authorised dealer
-      - foreign exchange
-      - fema
-      - ad category
-      - retail forex
-      - liberalised remittance
-
-  - name: risk-management
-    description: "Enterprise risk management frameworks including credit risk, market risk, operational risk, liquidity risk, ICAAP, and stress testing."
-    keywords:
-      - risk assessment
-      - risk policy
-      - credit risk
-      - market risk
-      - operational risk
-      - liquidity risk
-      - icaap
-      - stress testing
-      - risk appetite
-      - risk framework
-      - risk management committee
-
-  - name: corporate-governance
-    description: "Corporate governance including board composition, director eligibility, fit and proper criteria, audit committee, and senior management responsibilities."
-    keywords:
-      - board of directors
-      - independent director
-      - committee
-      - chairman
-      - managing director
-      - fit and proper
-      - governance
-      - board composition
-      - director appointment
-      - nomination committee
-      - audit committee
-
-  - name: aml-kyc
-    description: "Anti-money laundering, KYC, customer due diligence, suspicious transaction reporting, and PML Act compliance."
-    keywords:
-      - kyc
-      - aml
-      - pmla
-      - suspicious transaction
-      - str
-      - ctr
-      - customer identification
-      - due diligence
-      - pep
-      - beneficial owner
-      - money laundering
-      - terrorist financing
-      - fiu
-
-  - name: compliance-reporting
-    description: "Regulatory reporting, compliance filings, statutory returns, RBI submissions, and disclosure requirements."
-    keywords:
-      - regulatory return
-      - filing
-      - submission
-      - disclosure
-      - statutory report
-      - annual report
-      - pillar 3
-      - basel disclosure
-      - compliance report
-      - dsb return
-
-  - name: it-cyber-security
-    description: "IT governance, cybersecurity frameworks, IT audit, data privacy, information security, and digital banking guidelines."
-    keywords:
-      - it policy
-      - cybersecurity
-      - information security
-      - data protection
-      - ciso
-      - it audit
-      - digital banking
-      - internet banking
-      - mobile banking
-      - phishing
-      - cyber attack
-      - data breach
-      - vapt
-
-  - name: treasury-operations
-    description: "Treasury management, investment portfolio, SLR/CRR maintenance, ALM, interest rate management, and capital adequacy."
-    keywords:
-      - treasury
-      - slr
-      - crr
-      - investment
-      - capital adequacy
-      - crar
-      - basel
-      - capital buffer
-      - alm
-      - interest rate
-      - liquidity
-      - reserve requirements
-      - ndtl
-
-  - name: lending-credit
-    description: "Lending operations, credit policy, loan documentation, NPA management, priority sector lending, and loan recovery."
-    keywords:
-      - loan
-      - lending
-      - npa
-      - credit
-      - priority sector
-      - psl
-      - mortgage
-      - collateral
-      - loan recovery
-      - sarfaesi
-      - drt
-      - loan documentation
-      - credit appraisal
-      - borrower
-      - overdue
-      - provisioning
-
-  - name: operations-payments
-    description: "Banking operations, payment systems (RTGS, NEFT, UPI, IMPS), clearing, cheque processing, and settlement."
-    keywords:
-      - rtgs
-      - neft
-      - upi
-      - imps
-      - payment system
-      - clearing
-      - cheque
-      - settlement
-      - npci
-      - payment gateway
-      - cbs
-      - core banking
-      - operations
-
-  - name: human-resources
-    description: "HR policies, employee conduct, training requirements, staff accountability, compensation, and workforce management."
-    keywords:
-      - employee
-      - staff
-      - training
-      - hr policy
-      - compensation
-      - code of conduct
-      - disciplinary
-      - workforce
-      - recruitment
-      - staff accountability
-      - employee benefits
-
-  - name: customer-protection
-    description: "Customer rights, grievance redressal, fair practices, banking ombudsman, and customer protection regulations."
-    keywords:
-      - customer complaint
-      - grievance
-      - ombudsman
-      - fair practice code
-      - customer rights
-      - customer service
-      - consumer protection
-      - interest rate transparency
-      - charges disclosure
-      - customer grievance
+- name: administration
+  description: 'Primary Business Unit: Administration. Corporate support functions
+    including administration, premises and infrastructure, marketing and advertising
+    standards, corporate communications, and CSR. Use when the paragraph mentions
+    advertisement, marketing, media, CSR, corporate social responsibility, premises,
+    fire safety, physical security, infrastructure, or sustainable livelihood.'
+- name: audit
+  description: 'Primary Business Unit: Audit. Corporate governance including board
+    composition, director eligibility, fit and proper criteria, audit committee, nomination
+    committee, board meetings, and senior management responsibilities. Use when the
+    paragraph mentions board of directors, independent director, committee, chairman,
+    managing director, fit and proper, governance, board composition, or director
+    appointment. Also covers ethics, whistle-blower, legal, internal audit, secretarial
+    and ESG matters.'
+- name: compliance-anti-money-laundering
+  description: 'Primary Business Unit: Compliance-Anti Money Laundering. Anti-money
+    laundering, know your customer, customer due diligence, suspicious transaction
+    reporting, PML Act compliance, and CFT measures. Use when the paragraph mentions
+    KYC, AML, PMLA, suspicious transaction, STR, CTR, customer identification, due
+    diligence, PEP, beneficial owner, money laundering, or terrorist financing. Also
+    covers fraud, vigilance and staff accountability in fraud cases.'
+- name: corporate-banking
+  description: 'Primary Business Unit: Corporate Banking. Lending operations, credit
+    policy, loan documentation, NPA management, priority sector lending, and loan
+    recovery. Use when the paragraph mentions loan, lending, NPA, credit, priority
+    sector, PSL, mortgage, collateral, loan recovery, SARFAESI, DRT, loan documentation,
+    or credit appraisal. Also covers retail assets (auto, personal, gold, mortgage),
+    credit cards, credit units and collections.'
+- name: human-resources
+  description: 'Primary Business Unit: Human Resources. Human resources policies,
+    employee conduct, training requirements, staff accountability, compensation, and
+    workforce management. Use when the paragraph mentions employee, staff, training,
+    HR policy, compensation, code of conduct, disciplinary, workforce, recruitment,
+    staff accountability, or employee benefits.'
+  keywords:
+  - employee
+  - staff
+  - training
+  - hr policy
+  - compensation
+  - code of conduct
+  - disciplinary
+  - workforce
+  - recruitment
+  - staff accountability
+  - employee benefits
+- name: information-technology
+  description: 'Primary Business Unit: Information Technology. Information technology
+    governance, cybersecurity frameworks, IT audit, data privacy, information security,
+    and digital banking guidelines. Use when the paragraph mentions IT policy, cybersecurity,
+    information security, data protection, CISO, IT audit, digital banking, internet
+    banking, mobile banking, phishing, cyber attack, or data breach. Also covers data
+    privacy and digital banking.'
+- name: investment-banking-ecm
+  description: 'Primary Business Unit: Investment Banking-ECM. Capital markets, investment
+    banking, custody, depository participant services, bankers to issue, third-party
+    investment product distribution (mutual funds, insurance), and SEBI/stock exchange
+    compliance. Use when the paragraph mentions SEBI, stock exchange, depository,
+    custody, demat, bankers to issue, IPO, ECM, mutual fund distribution, AMFI, insurance
+    distribution, or high net worth clients.'
+- name: operations-nri
+  description: 'Primary Business Unit: Operations-NRI. Overseas branches and offices,
+    IFSC/GIFT City banking units, and NRI banking including NRE/NRO/FCNR accounts
+    and repatriation. Use when the paragraph mentions NRI, NRO, NRE, FCNR, repatriation,
+    overseas branch, foreign branch, IFSC, GIFT City, host country regulator, Singapore,
+    Hong Kong, DIFC, or Bahrain.'
+- name: operations-payment
+  description: 'Primary Business Unit: Operations-Payment. Banking operations, payment
+    systems, RTGS, NEFT, UPI, IMPS, clearing house, cheque processing, and customer
+    service operations. Use when the paragraph mentions RTGS, NEFT, UPI, IMPS, payment
+    system, clearing, cheque, settlement, NPCI, payment gateway, CBS, core banking,
+    or operations process. Also covers cash management, ATM, merchant acquiring, pension,
+    SGB, currency chest and deposit/liability products.'
+- name: operations-regulatory-reporting
+  description: 'Primary Business Unit: Operations-Regulatory Reporting. Regulatory
+    reporting, compliance filings, statutory returns, RBI submissions, and disclosure
+    requirements. Use when the paragraph mentions regulatory return, filing, submission,
+    disclosure, statutory report, annual report, pillar 3, Basel disclosure, or compliance
+    report. Also covers tax (TDS, GST), regulatory updates, and financial or regulatory
+    reporting by Finance.'
+- name: retail-branch-banking
+  description: 'Primary Business Unit: Retail Branch Banking. Customer rights, customer
+    service, grievance redressal, fair practices, banking ombudsman, and customer
+    protection regulations. Use when the paragraph mentions customer complaint, grievance,
+    ombudsman, fair practice code, customer rights, customer service, consumer protection,
+    interest rate transparency, charges disclosure, or customer grievance. Also covers
+    financial inclusion and service quality initiatives.'
+- name: risk-enterprise-risk-management
+  description: 'Primary Business Unit: Risk-Enterprise Risk Management. Enterprise
+    risk management frameworks including credit risk, market risk, operational risk,
+    liquidity risk, ICAAP, stress testing, and risk appetite. Use when the paragraph
+    mentions risk assessment, risk policy, credit risk, market risk, operational risk,
+    liquidity risk, ICAAP, stress testing, risk appetite, risk framework, or risk
+    management committee. Also covers BCM, outsourcing risk, model validation and
+    early warning signals.'
+- name: trade-product-group
+  description: 'Primary Business Unit: Trade Product Group. Retail foreign exchange
+    operations including LRS, authorised dealer categories, forex transactions for
+    individuals, remittance limits, and FEMA compliance. Use when the paragraph mentions
+    forex, LRS, remittance, authorised dealer, foreign exchange, FEMA, AD Category,
+    or retail forex operations. Also covers trade finance, nostro/vostro accounts
+    and trade products.'
+- name: treasury-front-office
+  description: 'Primary Business Unit: Treasury-Front Office. Treasury management,
+    investment portfolio, SLR/CRR maintenance, ALM (Asset Liability Management), interest
+    rate management, and capital adequacy. Use when the paragraph mentions treasury,
+    SLR, CRR, investment, capital adequacy, CRAR, Basel, capital buffer, ALM, interest
+    rate, liquidity, or reserve requirements. Also covers treasury trading, back office
+    and bullion.'

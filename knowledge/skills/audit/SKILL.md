@@ -1,12 +1,14 @@
 ---
-name: human-resources
+name: audit
 description: >
-  Primary Business Unit: Human Resources.
-  Human resources policies, employee conduct, training requirements,
-  staff accountability, compensation, and workforce management.
-  Use when the paragraph mentions employee, staff, training, HR policy,
-  compensation, code of conduct, disciplinary, workforce, recruitment,
-  staff accountability, or employee benefits.
+  Primary Business Unit: Audit.
+  Corporate governance including board composition, director eligibility,
+  fit and proper criteria, audit committee, nomination committee,
+  board meetings, and senior management responsibilities.
+  Use when the paragraph mentions board of directors, independent director,
+  committee, chairman, managing director, fit and proper, governance,
+  board composition, or director appointment.
+  Also covers ethics, whistle-blower, legal, internal audit, secretarial and ESG matters.
 ---
 
 ## Classification Values
@@ -14,26 +16,31 @@ description: >
 ### Business Unit
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Human Resources
+- Secretarial — board/committee governance, meetings, minutes
+- Audit — audit committee, internal/concurrent audit
+- Group Oversight
+- Ethics Office — code of ethics, whistle-blower
+- Corporate Legal — legal opinions, contracts, litigation
+- Environmental, Social and Governance — ESG
 
 ### Themes
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Policy — documented or board-approved policy requirement
-- Process — procedure or process steps to be followed
 - Governance — board/committee oversight and accountability
-- Assessment — risk/eligibility/impact assessment
-- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
 - Declaration — declarations or undertakings to be given or obtained
-- Monitoring — ongoing monitoring, review, surveillance
+- Policy — documented or board-approved policy requirement
+- Assessment — risk/eligibility/impact assessment
 - Disclosure — public or customer disclosure of information
+- Process — procedure or process steps to be followed
+- Monitoring — ongoing monitoring, review, surveillance
+- Internal Communication — communication within the organisation
 - Automation — automated processing or system-driven control
 - Customer Communication — communication to customers
 - Customer Loan Documentation — loan agreements, sanction letters, loan documents
 - Definition — paragraph defines a term or scope
 - External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
 - Information — purely informational or background text
-- Internal Communication — communication within the organisation
+- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
 - Notification — intimating a party of an event or change
 - Storage and records keeping — retention and maintenance of records
 - System configuration — system parameters, limits or configuration
@@ -237,25 +244,25 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 ### Control Objectives
 - Process and Policy
 - Documentation
-- Communication
 - Segregation of Duties
+- Audit Trail
 
 ## Few-Shot Examples
 
 ### Example 1
-**Paragraph**: "Banks shall ensure that all staff handling customer transactions undergo mandatory training on AML/CFT procedures at least once a year."
+**Paragraph**: "The Board of Directors shall comprise not less than 51% independent directors where the Chairman is a non-executive director."
 
 **Classification**:
 - para_type: "Action Para"
 - has_effective_date: "No"
 - effective_date: null
-- business_unit: "Human Resources"
-- theme: "Process"
+- business_unit: "Secretarial"
+- theme: "Governance"
 - control_object_name: "Process and Policy"
 - level_1: "Information Technology & Cyber Security"
 - level_2: "Operations Management"
 - level_3: "Exception Handling"
-- actionable: "Conduct mandatory annual AML/CFT training for all customer-facing staff"
+- actionable: "Ensure Board comprises at least 51% independent directors when Chairman is non-executive"
 
 ### Example 2
 **Paragraph**: "The revised instructions and system requirements shall take effect from October 01, 2025. All entities shall ensure necessary operational readiness before October 01, 2025."
@@ -264,7 +271,7 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 - para_type: "Future Effective"
 - has_effective_date: "Yes"
 - effective_date: "01/10/2025"
-- business_unit: "Human Resources"
+- business_unit: "Audit"
 - theme: "Process"
 - control_object_name: "Process and Policy"
 - level_1: "Governance"

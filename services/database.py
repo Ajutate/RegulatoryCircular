@@ -282,6 +282,10 @@ def save_document(
         )
         db.add(db_doc)
         
+        if analysis_results:
+            from core.date_utils import harmonize_document_effective_dates
+            harmonize_document_effective_dates(analysis_results)
+
         if paragraphs:
             for idx, text in enumerate(paragraphs):
                 result = analysis_results[idx] if analysis_results and idx < len(analysis_results) else {}
@@ -608,18 +612,9 @@ def update_document_results(doc_id: str, analysis_results: List[Dict[str, Any]])
             db.delete(p)
         db.flush()
         
-        # Check if there is exactly one unique effective date in all results
-        valid_dates = set()
-        for r in analysis_results:
-            d = r.get("effective_date")
-            if d and d.strip() and d.strip().lower() not in ["n/a", "none", "null"]:
-                valid_dates.add(d.strip())
-                
-        if len(valid_dates) == 1:
-            global_date = list(valid_dates)[0]
-            for r in analysis_results:
-                r["effective_date"] = global_date
-                r["has_effective_date"] = "Yes"
+        # Harmonize effective date across all results if any date is present
+        from core.date_utils import harmonize_document_effective_dates
+        harmonize_document_effective_dates(analysis_results)
             
         for idx, result in enumerate(analysis_results):
             para = Paragraph(

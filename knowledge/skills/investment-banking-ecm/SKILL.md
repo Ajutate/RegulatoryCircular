@@ -1,12 +1,12 @@
 ---
-name: human-resources
+name: investment-banking-ecm
 description: >
-  Primary Business Unit: Human Resources.
-  Human resources policies, employee conduct, training requirements,
-  staff accountability, compensation, and workforce management.
-  Use when the paragraph mentions employee, staff, training, HR policy,
-  compensation, code of conduct, disciplinary, workforce, recruitment,
-  staff accountability, or employee benefits.
+  Primary Business Unit: Investment Banking-ECM.
+  Capital markets, investment banking, custody, depository participant services,
+  bankers to issue, third-party investment product distribution (mutual funds,
+  insurance), and SEBI/stock exchange compliance. Use when the paragraph mentions
+  SEBI, stock exchange, depository, custody, demat, bankers to issue, IPO, ECM,
+  mutual fund distribution, AMFI, insurance distribution, or high net worth clients.
 ---
 
 ## Classification Values
@@ -14,31 +14,50 @@ description: >
 ### Business Unit
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Human Resources
+- Compliance-SEBI and Exchanges — SEBI and stock exchange compliance
+- Depository — depository participant services
+- Custody — custody services
+- Operations-Depository
+- Operations-Custody
+- Capital And Commodity Markets-Others
+- Capital And Commodity Markets-Custody
+- Capital And Conmodity Markets-Bankers To Issue
+- Operations-Bankers To Issue
+- Investment Banking-Securitization
+- Investment Banking-ECM — equity capital markets
+- Investment Banking-Project Monitoring
+- GIB Product
+- GIB-Institutional
+- GIB-Alternate Banking Channels And Partnerships
+- Strategic Investment
+- TPP-ME and Insurance — third-party insurance products
+- TPP-Mutual Fund Distribution — mutual fund distribution
+- Third Party Products-Research
+- HNW — high net worth clients
 
 ### Themes
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Policy — documented or board-approved policy requirement
-- Process — procedure or process steps to be followed
-- Governance — board/committee oversight and accountability
-- Assessment — risk/eligibility/impact assessment
-- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
-- Declaration — declarations or undertakings to be given or obtained
 - Monitoring — ongoing monitoring, review, surveillance
 - Disclosure — public or customer disclosure of information
-- Automation — automated processing or system-driven control
+- Process — procedure or process steps to be followed
+- Verification — verification/validation of documents, identity or data
 - Customer Communication — communication to customers
-- Customer Loan Documentation — loan agreements, sanction letters, loan documents
-- Definition — paragraph defines a term or scope
+- Governance — board/committee oversight and accountability
+- Storage and records keeping — retention and maintenance of records
 - External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
+- Policy — documented or board-approved policy requirement
+- Assessment — risk/eligibility/impact assessment
+- Automation — automated processing or system-driven control
+- Customer Loan Documentation — loan agreements, sanction letters, loan documents
+- Declaration — declarations or undertakings to be given or obtained
+- Definition — paragraph defines a term or scope
 - Information — purely informational or background text
 - Internal Communication — communication within the organisation
+- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
 - Notification — intimating a party of an event or change
-- Storage and records keeping — retention and maintenance of records
 - System configuration — system parameters, limits or configuration
 - Themes/ Other Attributes — only when no other theme applies
-- Verification — verification/validation of documents, identity or data
 
 ### Levels
 
@@ -235,27 +254,28 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 | Transaction Controls & Monitoring | Transaction Controls | Validation Rules |
 
 ### Control Objectives
+- Compliance Monitoring
 - Process and Policy
+- Risk
 - Documentation
 - Communication
-- Segregation of Duties
 
 ## Few-Shot Examples
 
 ### Example 1
-**Paragraph**: "Banks shall ensure that all staff handling customer transactions undergo mandatory training on AML/CFT procedures at least once a year."
+**Paragraph**: "Depository Participants shall ensure that client securities are held in segregated accounts and reconciled with depository records on a daily basis."
 
 **Classification**:
 - para_type: "Action Para"
 - has_effective_date: "No"
 - effective_date: null
-- business_unit: "Human Resources"
-- theme: "Process"
-- control_object_name: "Process and Policy"
+- business_unit: "Depository"
+- theme: "Monitoring"
+- control_object_name: "Compliance Monitoring"
 - level_1: "Information Technology & Cyber Security"
 - level_2: "Operations Management"
 - level_3: "Exception Handling"
-- actionable: "Conduct mandatory annual AML/CFT training for all customer-facing staff"
+- actionable: "Segregate client securities and reconcile with depository records daily"
 
 ### Example 2
 **Paragraph**: "The revised instructions and system requirements shall take effect from October 01, 2025. All entities shall ensure necessary operational readiness before October 01, 2025."
@@ -264,7 +284,7 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 - para_type: "Future Effective"
 - has_effective_date: "Yes"
 - effective_date: "01/10/2025"
-- business_unit: "Human Resources"
+- business_unit: "Investment Banking Ecm"
 - theme: "Process"
 - control_object_name: "Process and Policy"
 - level_1: "Governance"

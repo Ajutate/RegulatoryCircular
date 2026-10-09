@@ -1,12 +1,12 @@
 ---
-name: human-resources
+name: administration
 description: >
-  Primary Business Unit: Human Resources.
-  Human resources policies, employee conduct, training requirements,
-  staff accountability, compensation, and workforce management.
-  Use when the paragraph mentions employee, staff, training, HR policy,
-  compensation, code of conduct, disciplinary, workforce, recruitment,
-  staff accountability, or employee benefits.
+  Primary Business Unit: Administration.
+  Corporate support functions including administration, premises and infrastructure,
+  marketing and advertising standards, corporate communications, and CSR.
+  Use when the paragraph mentions advertisement, marketing, media, CSR,
+  corporate social responsibility, premises, fire safety, physical security,
+  infrastructure, or sustainable livelihood.
 ---
 
 ## Classification Values
@@ -14,25 +14,31 @@ description: >
 ### Business Unit
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Human Resources
+- Administration — premises, general administration, physical safety
+- Marketing — advertising and marketing communication
+- Corporate Communications — media, public/external communication
+- Corporate Social Responsibility — CSR activities and spending
+- Infrastructure — premises and infrastructure
+- Sustainable Livelihood Initiative
+- Virtual Care
 
 ### Themes
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
+- Customer Communication — communication to customers
+- External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
+- Monitoring — ongoing monitoring, review, surveillance
 - Policy — documented or board-approved policy requirement
 - Process — procedure or process steps to be followed
 - Governance — board/committee oversight and accountability
-- Assessment — risk/eligibility/impact assessment
-- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
-- Declaration — declarations or undertakings to be given or obtained
-- Monitoring — ongoing monitoring, review, surveillance
 - Disclosure — public or customer disclosure of information
-- Automation — automated processing or system-driven control
-- Customer Communication — communication to customers
-- Customer Loan Documentation — loan agreements, sanction letters, loan documents
-- Definition — paragraph defines a term or scope
-- External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
 - Information — purely informational or background text
+- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
+- Assessment — risk/eligibility/impact assessment
+- Automation — automated processing or system-driven control
+- Customer Loan Documentation — loan agreements, sanction letters, loan documents
+- Declaration — declarations or undertakings to be given or obtained
+- Definition — paragraph defines a term or scope
 - Internal Communication — communication within the organisation
 - Notification — intimating a party of an event or change
 - Storage and records keeping — retention and maintenance of records
@@ -236,26 +242,26 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 
 ### Control Objectives
 - Process and Policy
-- Documentation
 - Communication
-- Segregation of Duties
+- Risk
+- Documentation
 
 ## Few-Shot Examples
 
 ### Example 1
-**Paragraph**: "Banks shall ensure that all staff handling customer transactions undergo mandatory training on AML/CFT procedures at least once a year."
+**Paragraph**: "Banks shall ensure that all advertisements and marketing materials relating to financial products are fair, clear and not misleading."
 
 **Classification**:
 - para_type: "Action Para"
 - has_effective_date: "No"
 - effective_date: null
-- business_unit: "Human Resources"
-- theme: "Process"
-- control_object_name: "Process and Policy"
+- business_unit: "Marketing"
+- theme: "Customer Communication"
+- control_object_name: "Communication"
 - level_1: "Information Technology & Cyber Security"
 - level_2: "Operations Management"
 - level_3: "Exception Handling"
-- actionable: "Conduct mandatory annual AML/CFT training for all customer-facing staff"
+- actionable: "Ensure advertisements and marketing materials are fair, clear and not misleading"
 
 ### Example 2
 **Paragraph**: "The revised instructions and system requirements shall take effect from October 01, 2025. All entities shall ensure necessary operational readiness before October 01, 2025."
@@ -264,7 +270,7 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 - para_type: "Future Effective"
 - has_effective_date: "Yes"
 - effective_date: "01/10/2025"
-- business_unit: "Human Resources"
+- business_unit: "Administration"
 - theme: "Process"
 - control_object_name: "Process and Policy"
 - level_1: "Governance"

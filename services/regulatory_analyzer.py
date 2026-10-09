@@ -66,7 +66,7 @@ class RegulatoryAnalyzer:
             HumanMessage(content=user_prompt),
         ]
 
-        logger.debug(f"Analyzing paragraph {paragraph_number}/{total_paragraphs} using Agent Loop...")
+        logger.debug(f"Analyzing paragraph {paragraph_number}/{total_paragraphs} using Agent Loop with SkillMiddleware...")
         
         from langchain_core.callbacks import BaseCallbackHandler
         class LLMPromptLogger(BaseCallbackHandler):
@@ -114,6 +114,49 @@ class RegulatoryAnalyzer:
                 level_3="Unknown",
             )
 
+    # ------------------------------------------------------------------ #
+    #  Skill selection                                                    #
+    # ------------------------------------------------------------------ #
+
+    def _resolve_skills(self, paragraph: str) -> list[str]:
+        """Pick skills by keyword match; if none match, ask the LLM to route."""
+        from core.skill_loader import select_skills, load_skill_index
+
+        names = select_skills(paragraph)
+        if names:
+            return names
+
+        index = load_skill_index()
+        valid = [s["name"] for s in index]
+        catalog = "\n".join(f"- {s['name']}: {s['description']}" for s in index)
+        try:
+            resp = self._llm.invoke([
+                SystemMessage(content=(
+                    "You route regulatory paragraphs to the most relevant classification skill. "
+                    "Reply with ONLY the exact skill name from the list (you may give up to 2, comma-separated). "
+                    "You must always pick the closest skill.\n\n" + catalog
+                )),
+                HumanMessage(content=paragraph),
+            ])
+            text = str(resp.content).lower()
+            return [n for n in valid if n in text][:2]
+        except Exception as e:
+            logger.warning(f"Skill routing failed: {e}")
+            return []
+
+    @staticmethod
+    def _build_skill_context(skill_names: list[str]) -> str:
+        from core.skill_loader import load_skill_body
+
+        sections = []
+        for name in skill_names:
+            body = load_skill_body(name)
+            if body:
+                sections.append(f"### Skill: {name}\n\n{body}")
+        if not sections:
+            return ""
+        return "## Activated Skill Context\n\n" + "\n\n".join(sections)
+
     def analyze_all(
         self,
         paragraphs: list[str],
@@ -150,6 +193,10 @@ class RegulatoryAnalyzer:
             if on_progress:
                 on_progress(idx, total, result)
 
+        # Harmonize effective date across all paragraphs if any date is present
+        from core.date_utils import harmonize_document_effective_dates
+        harmonize_document_effective_dates(results)
+
         logger.info(f"Batch analysis complete for {total} paragraphs")
         return results
 
@@ -180,15 +227,90 @@ class RegulatoryAnalyzer:
 
         data = json.loads(json_match.group())
 
+        # Debug logging to see exactly what JSON the LLM returned
+        logger.error(f"RAW JSON EXTRACTED FROM LLM: {json.dumps(data, indent=2)}")
+        
+        # If the LLM returned {"Examples": [...]} or [{"para_type": ...}], extract from it
+        if ("para_type" not in data) and any(k.lower() in ("examples", "results", "items") for k in data):
+            for k in list(data.keys()):
+                if k.lower() in ("examples", "results", "items") and isinstance(data[k], list) and len(data[k]) > 0:
+                    first_item = data[k][0]
+                    if isinstance(first_item, dict):
+                        if any(ck.lower() == "classification" for ck in first_item):
+                            c_val = next(v for ck, v in first_item.items() if ck.lower() == "classification")
+                            if isinstance(c_val, dict):
+                                data = c_val
+                        else:
+                            data = first_item
+                    break
+
+        # If the LLM nested the output inside a "classification", "analysis", or "result" object, lift it
+        for k in list(data.keys()):
+            if k.lower() in ("classification", "analysis", "result", "output") and isinstance(data[k], dict):
+                for sub_k, sub_v in data[k].items():
+                    data[sub_k] = sub_v
+
+        # Map alternate key names
+        if "paragraph" in data and not data.get("paragraph_text"):
+            data["paragraph_text"] = data["paragraph"]
+        if "paragraph_type" in data and not data.get("para_type"):
+            data["para_type"] = data["paragraph_type"]
+        elif "type" in data and not data.get("para_type"):
+            data["para_type"] = data["type"]
+        if "control_objective" in data and not data.get("control_object_name"):
+            data["control_object_name"] = data["control_objective"]
+        elif "control_objective_name" in data and not data.get("control_object_name"):
+            data["control_object_name"] = data["control_objective_name"]
+        if "action" in data and not data.get("actionable"):
+            data["actionable"] = data["action"]
+        elif "action_required" in data and not data.get("actionable"):
+            data["actionable"] = data["action_required"]
+
         # Always override paragraph_text with the original to prevent hallucination
         data["paragraph_text"] = original_paragraph
 
-        # Normalise has_effective_date to Yes/No
-        hed = str(data.get("has_effective_date", "No")).strip().lower()
-        data["has_effective_date"] = "Yes" if hed in ("yes", "true", "1") else "No"
+        # Normalise and extract effective date
+        from core.date_utils import parse_date_to_dmy, extract_effective_date_from_text
 
-        # Ensure effective_date is None when not present
-        if data.get("effective_date") in (None, "", "null", "N/A", "n/a"):
-            data["effective_date"] = None
+        parsed_llm_date = parse_date_to_dmy(data.get("effective_date"))
+        if not parsed_llm_date:
+            has_d, text_date = extract_effective_date_from_text(original_paragraph)
+            if has_d == "Yes" and text_date:
+                logger.info(f"Captured effective date '{text_date}' from paragraph text")
+                data["has_effective_date"] = "Yes"
+                data["effective_date"] = text_date
+            else:
+                data["has_effective_date"] = "No"
+                data["effective_date"] = None
+        else:
+            data["has_effective_date"] = "Yes"
+            data["effective_date"] = parsed_llm_date
+
+        # Snap business_unit, theme, and para_type to their approved lists (exact spelling)
+        from core.skill_loader import (
+            normalize_business_unit,
+            normalize_theme,
+            normalize_levels,
+            normalize_para_type,
+        )
+        data["para_type"] = normalize_para_type(data.get("para_type"))
+        data["business_unit"] = normalize_business_unit(data.get("business_unit"))
+        data["theme"] = normalize_theme(data.get("theme"))
+        
+        # Provide defaults for commonly omitted fields
+        if not data.get("control_object_name"):
+            data["control_object_name"] = "N/A"
+        if not data.get("actionable"):
+            data["actionable"] = "No action required" if data["para_type"] == "Information Para" else "N/A"
+            
+        # Snap levels to the approved global hierarchy
+        l1, l2, l3 = normalize_levels(
+            data.get("level_1"), 
+            data.get("level_2"), 
+            data.get("level_3")
+        )
+        data["level_1"] = l1
+        data["level_2"] = l2
+        data["level_3"] = l3
 
         return RegulatoryParagraphAnalysis(**data)

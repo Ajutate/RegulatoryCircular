@@ -16,13 +16,16 @@ class SkillMiddleware(AgentMiddleware):
     def __init__(self):
         """Initialize and generate the skills prompt from SKILLS."""
         super().__init__()
-        # Build skills prompt from the skill_index
+        # Build concise skills prompt from the skill_index
         index = load_skill_index()
         skills_list = []
         for skill in index:
-            skills_list.append(
-                f"- **{skill['name']}**: {skill['description']}"
-            )
+            desc = skill.get("description", "")
+            if "Use when the paragraph mentions" in desc:
+                core = desc.split("Use when the paragraph mentions")[1].split(".")[0].strip()
+                skills_list.append(f"- **{skill['name']}**: Covers {core}")
+            else:
+                skills_list.append(f"- **{skill['name']}**: {desc.split('.')[0].strip()}")
         self.skills_prompt = "\n".join(skills_list)
 
     def wrap_model_call(
@@ -34,21 +37,32 @@ class SkillMiddleware(AgentMiddleware):
         # Build the skills addendum
         skills_addendum = (
             f"\n\n## Available Skills\n\n{self.skills_prompt}\n\n"
-            "Use the read_skill tool when you need detailed information "
-            "about handling a specific type of request. Pass the exact skill name to read_skill."
+            "To load the taxonomy values (business units, themes, levels, control objectives) for any domain above, "
+            "call the `read_skill` tool with the skill name (e.g. `read_skill(skill_name='treasury-front-office')`). "
+            "Note: `read_skill` is the ONLY tool available. Once you receive the taxonomy, respond with the final JSON."
         )
 
-        # Assuming the state holds the messages list and the first message is SystemMessage
-        messages = request.state.get("messages", [])
-        new_messages = list(messages)
+        # request.messages holds the messages passed to the model
+        new_messages = list(request.messages)
+        modified = False
         
         for i, msg in enumerate(new_messages):
-            if isinstance(msg, SystemMessage) or getattr(msg, 'type', '') == 'system':
-                old_content = msg.content if hasattr(msg, 'content') else msg.get("content", "")
-                new_sys_msg = SystemMessage(content=old_content + skills_addendum)
-                new_messages[i] = new_sys_msg
-                logger.info(f"\n\n--- Final System Prompt (Post-Middleware) ---\n{new_sys_msg.content}\n---------------------------------------------\n")
+            if isinstance(msg, SystemMessage) or getattr(msg, "type", "") == "system":
+                old_content = msg.content if hasattr(msg, "content") else str(msg)
+                if "## Available Skills" not in old_content:
+                    new_sys_msg = SystemMessage(content=old_content + skills_addendum)
+                    new_messages[i] = new_sys_msg
+                    modified = True
+                    logger.info("SkillMiddleware injected available skills catalog into SystemMessage.")
                 break
                 
-        request.state["messages"] = new_messages
+        if modified:
+            return handler(request.override(messages=new_messages))
+            
+        # Fallback for request.system_prompt attribute if system prompt is configured separately
+        if request.system_prompt and "## Available Skills" not in request.system_prompt:
+            new_sys = request.system_prompt + skills_addendum
+            logger.info("SkillMiddleware injected available skills catalog into request.system_prompt.")
+            return handler(request.override(system_prompt=new_sys))
+
         return handler(request)

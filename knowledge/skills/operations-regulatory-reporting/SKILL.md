@@ -1,12 +1,12 @@
 ---
-name: human-resources
+name: operations-regulatory-reporting
 description: >
-  Primary Business Unit: Human Resources.
-  Human resources policies, employee conduct, training requirements,
-  staff accountability, compensation, and workforce management.
-  Use when the paragraph mentions employee, staff, training, HR policy,
-  compensation, code of conduct, disciplinary, workforce, recruitment,
-  staff accountability, or employee benefits.
+  Primary Business Unit: Operations-Regulatory Reporting.
+  Regulatory reporting, compliance filings, statutory returns, RBI submissions,
+  and disclosure requirements. Use when the paragraph mentions regulatory return,
+  filing, submission, disclosure, statutory report, annual report, pillar 3,
+  Basel disclosure, or compliance report.
+  Also covers tax (TDS, GST), regulatory updates, and financial or regulatory reporting by Finance.
 ---
 
 ## Classification Values
@@ -14,28 +14,42 @@ description: >
 ### Business Unit
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Human Resources
+- Compliance-RRD — regulatory returns and submissions
+- Operations-Regulatory Reporting — operational/statutory returns
+- Finance-PAD — financial disclosures (e.g. Pillar 3)
+- Finance-REG — regulatory financial reporting and capital computation
+- Compliance-RBI RBS Regulatory Updates — tracking RBI/regulatory updates
+- Compliance-Subsidiaries and Support Function
+- Compliance-Treasury, Risk and Finance
+- Operations-Regulatory
+- Operations-RBI Liasion Desk — RBI correspondence
+- Finance-FAG
+- Finance-BDP
+- Finance-Finance Strategy and Balance sheet forecasting
+- Finance-TAX — tax matters
+- Operations-TDS — TDS processing and returns
+- Operations-GST — GST processing and returns
 
 ### Themes
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Policy — documented or board-approved policy requirement
-- Process — procedure or process steps to be followed
-- Governance — board/committee oversight and accountability
-- Assessment — risk/eligibility/impact assessment
-- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
-- Declaration — declarations or undertakings to be given or obtained
-- Monitoring — ongoing monitoring, review, surveillance
+- External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
 - Disclosure — public or customer disclosure of information
+- Notification — intimating a party of an event or change
+- Governance — board/committee oversight and accountability
+- Process — procedure or process steps to be followed
+- Monitoring — ongoing monitoring, review, surveillance
+- Storage and records keeping — retention and maintenance of records
+- Assessment — risk/eligibility/impact assessment
 - Automation — automated processing or system-driven control
 - Customer Communication — communication to customers
 - Customer Loan Documentation — loan agreements, sanction letters, loan documents
+- Declaration — declarations or undertakings to be given or obtained
 - Definition — paragraph defines a term or scope
-- External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
 - Information — purely informational or background text
 - Internal Communication — communication within the organisation
-- Notification — intimating a party of an event or change
-- Storage and records keeping — retention and maintenance of records
+- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
+- Policy — documented or board-approved policy requirement
 - System configuration — system parameters, limits or configuration
 - Themes/ Other Attributes — only when no other theme applies
 - Verification — verification/validation of documents, identity or data
@@ -235,27 +249,27 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 | Transaction Controls & Monitoring | Transaction Controls | Validation Rules |
 
 ### Control Objectives
-- Process and Policy
 - Documentation
-- Communication
-- Segregation of Duties
+- Process and Policy
+- Audit Trail
+- Compliance Monitoring
 
 ## Few-Shot Examples
 
 ### Example 1
-**Paragraph**: "Banks shall ensure that all staff handling customer transactions undergo mandatory training on AML/CFT procedures at least once a year."
+**Paragraph**: "Banks shall submit the DSB Return (Form A) to RBI on a fortnightly basis within 7 days from the close of the reporting fortnight."
 
 **Classification**:
 - para_type: "Action Para"
 - has_effective_date: "No"
 - effective_date: null
-- business_unit: "Human Resources"
-- theme: "Process"
+- business_unit: "Compliance-RRD"
+- theme: "External Communication (other than customer)"
 - control_object_name: "Process and Policy"
 - level_1: "Information Technology & Cyber Security"
 - level_2: "Operations Management"
 - level_3: "Exception Handling"
-- actionable: "Conduct mandatory annual AML/CFT training for all customer-facing staff"
+- actionable: "Submit DSB Return (Form A) to RBI fortnightly within 7 days of reporting fortnight close"
 
 ### Example 2
 **Paragraph**: "The revised instructions and system requirements shall take effect from October 01, 2025. All entities shall ensure necessary operational readiness before October 01, 2025."
@@ -264,7 +278,7 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 - para_type: "Future Effective"
 - has_effective_date: "Yes"
 - effective_date: "01/10/2025"
-- business_unit: "Human Resources"
+- business_unit: "Operations Regulatory Reporting"
 - theme: "Process"
 - control_object_name: "Process and Policy"
 - level_1: "Governance"

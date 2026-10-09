@@ -1,12 +1,13 @@
 ---
-name: human-resources
+name: compliance-anti-money-laundering
 description: >
-  Primary Business Unit: Human Resources.
-  Human resources policies, employee conduct, training requirements,
-  staff accountability, compensation, and workforce management.
-  Use when the paragraph mentions employee, staff, training, HR policy,
-  compensation, code of conduct, disciplinary, workforce, recruitment,
-  staff accountability, or employee benefits.
+  Primary Business Unit: Compliance-Anti Money Laundering.
+  Anti-money laundering, know your customer, customer due diligence,
+  suspicious transaction reporting, PML Act compliance, and CFT measures.
+  Use when the paragraph mentions KYC, AML, PMLA, suspicious transaction,
+  STR, CTR, customer identification, due diligence, PEP, beneficial owner,
+  money laundering, or terrorist financing.
+  Also covers fraud, vigilance and staff accountability in fraud cases.
 ---
 
 ## Classification Values
@@ -14,31 +15,33 @@ description: >
 ### Business Unit
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Human Resources
+- Compliance-Anti Money Laundering — AML/CFT, STR/CTR reporting to FIU
+- Compliance-Liability and KYC — KYC/CDD on customer accounts
+- Fraud and Vigilance — fraud detection, vigilance, staff accountability in fraud cases
 
 ### Themes
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Policy — documented or board-approved policy requirement
-- Process — procedure or process steps to be followed
-- Governance — board/committee oversight and accountability
-- Assessment — risk/eligibility/impact assessment
-- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
-- Declaration — declarations or undertakings to be given or obtained
+- Verification — verification/validation of documents, identity or data
 - Monitoring — ongoing monitoring, review, surveillance
-- Disclosure — public or customer disclosure of information
+- External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
+- Process — procedure or process steps to be followed
+- Policy — documented or board-approved policy requirement
+- Assessment — risk/eligibility/impact assessment
+- Storage and records keeping — retention and maintenance of records
+- Declaration — declarations or undertakings to be given or obtained
 - Automation — automated processing or system-driven control
 - Customer Communication — communication to customers
 - Customer Loan Documentation — loan agreements, sanction letters, loan documents
 - Definition — paragraph defines a term or scope
-- External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
+- Disclosure — public or customer disclosure of information
+- Governance — board/committee oversight and accountability
 - Information — purely informational or background text
 - Internal Communication — communication within the organisation
+- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
 - Notification — intimating a party of an event or change
-- Storage and records keeping — retention and maintenance of records
 - System configuration — system parameters, limits or configuration
 - Themes/ Other Attributes — only when no other theme applies
-- Verification — verification/validation of documents, identity or data
 
 ### Levels
 
@@ -235,27 +238,27 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 | Transaction Controls & Monitoring | Transaction Controls | Validation Rules |
 
 ### Control Objectives
-- Process and Policy
+- Compliance Monitoring
 - Documentation
-- Communication
-- Segregation of Duties
+- Process and Policy
+- Risk
 
 ## Few-Shot Examples
 
 ### Example 1
-**Paragraph**: "Banks shall ensure that all staff handling customer transactions undergo mandatory training on AML/CFT procedures at least once a year."
+**Paragraph**: "Banks shall carry out Customer Due Diligence (CDD) at the time of opening a new account, including verification of identity using officially valid documents as defined under the PMLA Rules."
 
 **Classification**:
 - para_type: "Action Para"
 - has_effective_date: "No"
 - effective_date: null
-- business_unit: "Human Resources"
-- theme: "Process"
+- business_unit: "Compliance-Liability and KYC"
+- theme: "Verification"
 - control_object_name: "Process and Policy"
 - level_1: "Information Technology & Cyber Security"
 - level_2: "Operations Management"
 - level_3: "Exception Handling"
-- actionable: "Conduct mandatory annual AML/CFT training for all customer-facing staff"
+- actionable: "Perform CDD at account opening using officially valid documents per PMLA Rules"
 
 ### Example 2
 **Paragraph**: "The revised instructions and system requirements shall take effect from October 01, 2025. All entities shall ensure necessary operational readiness before October 01, 2025."
@@ -264,7 +267,7 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 - para_type: "Future Effective"
 - has_effective_date: "Yes"
 - effective_date: "01/10/2025"
-- business_unit: "Human Resources"
+- business_unit: "Compliance Anti Money Laundering"
 - theme: "Process"
 - control_object_name: "Process and Policy"
 - level_1: "Governance"

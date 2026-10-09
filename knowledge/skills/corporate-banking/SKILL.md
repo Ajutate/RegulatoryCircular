@@ -1,12 +1,13 @@
 ---
-name: human-resources
+name: corporate-banking
 description: >
-  Primary Business Unit: Human Resources.
-  Human resources policies, employee conduct, training requirements,
-  staff accountability, compensation, and workforce management.
-  Use when the paragraph mentions employee, staff, training, HR policy,
-  compensation, code of conduct, disciplinary, workforce, recruitment,
-  staff accountability, or employee benefits.
+  Primary Business Unit: Corporate Banking.
+  Lending operations, credit policy, loan documentation, NPA management,
+  priority sector lending, and loan recovery. Use when the paragraph
+  mentions loan, lending, NPA, credit, priority sector, PSL, mortgage,
+  collateral, loan recovery, SARFAESI, DRT, loan documentation, or
+  credit appraisal.
+  Also covers retail assets (auto, personal, gold, mortgage), credit cards, credit units and collections.
 ---
 
 ## Classification Values
@@ -14,31 +15,61 @@ description: >
 ### Business Unit
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Human Resources
+- Corporate Banking — large/corporate loans
+- Business Banking - Working Capital — working capital facilities
+- Retail Agri — agri/priority sector
+- Collection — overdue follow-up and loan recovery
+- Compliance-Credit — credit compliance
+- Credit-Wholesale Credit
+- Credit-SME Credit
+- Credit-Business-SME
+- Credit-Retail Credit
+- Credit-Home Loan Credit
+- Credit-Collections
+- Credit-Securitisation
+- Credit-Dept for Special Ops
+- Credit-Credit Intelligence and Control
+- Credit Intelligence and Control
+- Credit-Retail Credit Strategy and Control
+- Credit-Retail Credit Strategy Control-Bureau Management Team — credit bureau management
+- Credit-RCSC-RETAIL MORIGAGE HOUSING
+- Credit Cards — credit card products
+- Emerging Corporates Group
+- Healthcare Finance
+- Retail Assets-Mortgage
+- Retail Assets-Realty Finance
+- Retail Assets - Auto Loans
+- Retail Assets - Personal Loan
+- Retail Assets - Gold Loan
+- Retail Assets - Securitisation
+- Operations-Retail Asset — retail asset operations
+- Operations-Loan against Gold And Jewellery
+- Operations-Credit Administration Department — credit administration
+- Operations-Credit Cards — credit card operations
 
 ### Themes
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Policy — documented or board-approved policy requirement
 - Process — procedure or process steps to be followed
-- Governance — board/committee oversight and accountability
-- Assessment — risk/eligibility/impact assessment
-- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
-- Declaration — declarations or undertakings to be given or obtained
 - Monitoring — ongoing monitoring, review, surveillance
-- Disclosure — public or customer disclosure of information
-- Automation — automated processing or system-driven control
-- Customer Communication — communication to customers
 - Customer Loan Documentation — loan agreements, sanction letters, loan documents
-- Definition — paragraph defines a term or scope
-- External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
-- Information — purely informational or background text
-- Internal Communication — communication within the organisation
+- Policy — documented or board-approved policy requirement
+- Assessment — risk/eligibility/impact assessment
+- Verification — verification/validation of documents, identity or data
+- Disclosure — public or customer disclosure of information
+- Customer Communication — communication to customers
 - Notification — intimating a party of an event or change
 - Storage and records keeping — retention and maintenance of records
+- Declaration — declarations or undertakings to be given or obtained
+- Automation — automated processing or system-driven control
+- Definition — paragraph defines a term or scope
+- External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
+- Governance — board/committee oversight and accountability
+- Information — purely informational or background text
+- Internal Communication — communication within the organisation
+- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
 - System configuration — system parameters, limits or configuration
 - Themes/ Other Attributes — only when no other theme applies
-- Verification — verification/validation of documents, identity or data
 
 ### Levels
 
@@ -235,27 +266,27 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 | Transaction Controls & Monitoring | Transaction Controls | Validation Rules |
 
 ### Control Objectives
-- Process and Policy
 - Documentation
-- Communication
-- Segregation of Duties
+- Process and Policy
+- Risk
+- Compliance Monitoring
 
 ## Few-Shot Examples
 
 ### Example 1
-**Paragraph**: "Banks shall ensure that all staff handling customer transactions undergo mandatory training on AML/CFT procedures at least once a year."
+**Paragraph**: "Banks shall classify a loan account as Non-Performing Asset (NPA) if interest and/or instalment of principal remains overdue for a period of more than 90 days."
 
 **Classification**:
 - para_type: "Action Para"
 - has_effective_date: "No"
 - effective_date: null
-- business_unit: "Human Resources"
+- business_unit: "Corporate Banking"
 - theme: "Process"
 - control_object_name: "Process and Policy"
 - level_1: "Information Technology & Cyber Security"
 - level_2: "Operations Management"
 - level_3: "Exception Handling"
-- actionable: "Conduct mandatory annual AML/CFT training for all customer-facing staff"
+- actionable: "Classify loan accounts as NPA when interest/principal overdue exceeds 90 days"
 
 ### Example 2
 **Paragraph**: "The revised instructions and system requirements shall take effect from October 01, 2025. All entities shall ensure necessary operational readiness before October 01, 2025."
@@ -264,7 +295,7 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 - para_type: "Future Effective"
 - has_effective_date: "Yes"
 - effective_date: "01/10/2025"
-- business_unit: "Human Resources"
+- business_unit: "Corporate Banking"
 - theme: "Process"
 - control_object_name: "Process and Policy"
 - level_1: "Governance"

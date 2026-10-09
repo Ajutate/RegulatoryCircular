@@ -1,0 +1,190 @@
+Level 1,Level 2,Level 3
+Communication and Conduct,Crisis Communication / PR / Media Management,PR & Media Management
+Communication and Conduct,Crisis Communication / PR / Media Management,Post Crisis Review
+Communication and Conduct,Customer Communication and Conduct (Business as usual Scenario),Customer Communication
+Communication and Conduct,Customer Communication and Conduct (Business as usual Scenario),Customer Grievance Redressal
+Communication and Conduct,Customer Communication and Conduct (Business as usual Scenario),Customer Onboarding & Conduct
+Communication and Conduct,Customer Communication and Conduct (Business as usual Scenario),"Disclosure of product features, fees and charges and risks to the customers/potential customers"
+Communication and Conduct,Public Communication,Advertisement Program
+Communication and Conduct,Public Communication,Approval related to formats and templates for Public
+Communication and Conduct,Public Communication,Content Quality Review and Approval for Public Communications
+Communication and Conduct,Public Communication,Monitoring Team / Public Release
+Due Diligence,Customer Due Diligence,Credit Appraisal / Assessment
+Due Diligence,Customer Due Diligence,Customer Due Diligence (CKYC / FATCA / CERSAI / Udyam / IEC / KRA / etc.)
+Due Diligence,Customer Due Diligence,Customer Due Diligence - KYC/CIP/EDD/CDD
+Due Diligence,Customer Due Diligence,Maker Checker
+Due Diligence,Customer Due Diligence,Name/Sanctions Screening
+Due Diligence,Customer Due Diligence,Negative List monitoring
+Due Diligence,Customer Due Diligence,Risk Categorization
+Due Diligence,Employee Due Diligence,Conflict of Interest and Related Party checks
+Due Diligence,Employee Due Diligence,Functional Assessment
+Due Diligence,Employee Due Diligence,Reference/Background Checks
+Due Diligence,Employee Due Diligence,Integrity and BGV
+Due Diligence,Employee Due Diligence,Maker Checker
+Due Diligence,Employee Due Diligence,Pre-employment Screening
+Due Diligence,Vendor Due Diligence,Vendor Onboarding
+Due Diligence,Related Party Transactions Due Diligence,Conflict of Interest and Related Party checks
+Governance,Budget Approvals,Expense Approval
+Governance,Budget Approvals,Investment Approval
+Governance,Budget Approvals,IT Spends
+Governance,Budget Approvals,Physical Asset Spends
+Governance,Budget Approvals,Travel Spends
+Governance,Corporate Governance,Board & Committee Process
+Governance,Corporate Governance,Committee - Roles and Responsibilities
+Governance,Corporate Governance,Delegation of Authority
+Governance,Corporate Governance,Escalation Matrix
+Governance,Corporate Governance,Fit and Proper Criteria
+Governance,Corporate Governance,Segregation of Duties
+Governance,Corporate Governance,Succession Planning
+Governance,Model Lifecycle Controls,Model Development
+Governance,Model Lifecycle Controls,Model Implementation
+Governance,Model Lifecycle Controls,Model Independent Review Testing
+Governance,Model Lifecycle Controls,Model Usage
+Governance,Model Lifecycle Controls,Model Validation / Qualification of Quant Method
+Governance,Policy Framework,Business Continuity Plan
+Governance,Policy Framework,Maker Checker
+Governance,Policy Framework,Policy
+Governance,Policy Framework,Process Manual
+Governance,Policy Framework,SOP/Manual
+Governance,Process Performance/Quality Control,External Reviews
+Governance,Process Performance/Quality Control,"Audits Reviews (Internal auditors, co-appointed by internal auditors, and statutory audit)"
+Governance,Process Performance/Quality Control,Periodic Portfolio Review
+Governance,Process Performance/Quality Control,Quality Control Review
+Governance,Process Performance/Quality Control,Maker Checker
+Governance,Strategy & Appetite,Business Plan
+Governance,Strategy & Appetite,Monitoring Board metrics
+Governance,Strategy & Appetite,Regulatory target/threshold adherences
+Governance,Strategy & Appetite,Reward & Remuneration
+Governance,Strategy & Appetite,Review of Strategy
+Governance,Strategy & Appetite,Risk Appetite Statement and Thresholds
+Information Technology & Cyber Security,Access Controls,Identity Management
+Information Technology & Cyber Security,Access Controls,Privileged User Access
+Information Technology & Cyber Security,Access Controls,Physical Controls
+Information Technology & Cyber Security,Access Controls,Role Based Access
+Information Technology & Cyber Security,Access Controls,Safety Measures
+Information Technology & Cyber Security,Access Controls,User De-Provisioning
+Information Technology & Cyber Security,Access Controls,User Provisioning
+Information Technology & Cyber Security,Access Controls,"User access reviews (Join, move, resignation, etc.)"
+Information Technology & Cyber Security,Application Security,Change Management
+Information Technology & Cyber Security,Application Security,Post Deployment / Application Protection
+Information Technology & Cyber Security,Application Security,Secure Coding
+Information Technology & Cyber Security,Application Security,Segregation of Environments
+Information Technology & Cyber Security,Application Security,Vulnerability Assessment and Penetration Testing (VAPT) / Security Testing
+Information Technology & Cyber Security,Asset Management,Asset Register
+Information Technology & Cyber Security,Asset Management,Asset Inventory
+Information Technology & Cyber Security,Asset Management,Exception Reporting
+Information Technology & Cyber Security,Asset Management,Hardware Physical Verification
+Information Technology & Cyber Security,Asset Management,Software Verification
+Information Technology & Cyber Security,Business Continuity and Disaster Recovery,Alternate Location
+Information Technology & Cyber Security,Business Continuity and Disaster Recovery,Disaster Recovery (DR) Setup
+Information Technology & Cyber Security,Business Continuity and Disaster Recovery,DR Drill/BCP Testing
+Information Technology & Cyber Security,Business Continuity and Disaster Recovery,Offsite Backup
+Information Technology & Cyber Security,Business Continuity and Disaster Recovery,Parallel Processing
+Information Technology & Cyber Security,Business Continuity and Disaster Recovery,Periodic Review
+Information Technology & Cyber Security,Business Continuity and Disaster Recovery,System Availability
+Information Technology & Cyber Security,Cloud Security,Audit and Monitoring
+Information Technology & Cyber Security,Cloud Security,Cloud Asset Inventory
+Information Technology & Cyber Security,Cloud Security,Workload Segmentation
+Information Technology & Cyber Security,Data Management,Data Classification and Retention
+Information Technology & Cyber Security,Data Management,Data Collection
+Information Technology & Cyber Security,Data Management,Data Disposal
+Information Technology & Cyber Security,Data Management,Data Privacy
+Information Technology & Cyber Security,Data Management,Data Quality
+Information Technology & Cyber Security,Data Management,Data Security
+Information Technology & Cyber Security,Data Management,Data Sharing and Transfer
+Information Technology & Cyber Security,Data Management,Data Storage and Retention
+Information Technology & Cyber Security,Data Management,Data Usage
+Information Technology & Cyber Security,Device Security,Data Loss Prevention
+Information Technology & Cyber Security,Device Security,Device Hardening
+Information Technology & Cyber Security,Device Security,End User Device Security
+Information Technology & Cyber Security,Device Security,Mobile Device Management (MDM)
+Information Technology & Cyber Security,Device Security,Patch Management
+Information Technology & Cyber Security,Network Security,IP Whitelisting
+Information Technology & Cyber Security,Network Security,Isolation
+Information Technology & Cyber Security,Network Security,Network Access Controls
+Information Technology & Cyber Security,Network Security,Perimeter Controls
+Information Technology & Cyber Security,Operations Management,Exception Handling
+Information Technology & Cyber Security,Operations Management,Job Scheduling
+Information Technology & Cyber Security,Operations Management,System Health Check
+Information Technology & Cyber Security,Operations Management,System Update Monitoring
+Information Technology & Cyber Security,Security Monitoring,Data Loss Prevention (DLP)
+Information Technology & Cyber Security,Security Monitoring,Maintenance of Logs
+Information Technology & Cyber Security,Security Monitoring,Network Monitoring
+Information Technology & Cyber Security,Security Monitoring,Secure SOC
+Information Technology & Cyber Security,Security Monitoring,Security Operations Center (SOC) Monitoring
+Information Technology & Cyber Security,Change Management,Business Requirement Document
+Information Technology & Cyber Security,Change Management,Go-Live Protocol
+Information Technology & Cyber Security,Change Management,Impact Assessment
+Information Technology & Cyber Security,Change Management,Maker Checker / Initial Performance Monitoring
+Information Technology & Cyber Security,Change Management,Pilot Runs
+Information Technology & Cyber Security,Change Management,Segregation of development and production environment
+Information Technology & Cyber Security,Change Management,User Acceptance
+Information Technology & Cyber Security,System Reconciliation,Data completeness and disposal
+Information Technology & Cyber Security,System Reconciliation,Interface Master/Checks
+Information Technology & Cyber Security,System Reconciliation,Logic validation in Core Systems
+Information Technology & Cyber Security,System Reconciliation,Reconciliations across Systems
+Physical Non IT assets and Safety Controls,Asset Verification,Exception Reporting
+Physical Non IT assets and Safety Controls,Asset Verification,Revertion and Testing
+Physical Non IT assets and Safety Controls,Asset Verification,Periodic Physical Verification
+Physical Non IT assets and Safety Controls,Environment Controls,Emergency Response
+Physical Non IT assets and Safety Controls,Environment Controls,Periodic Maintenance
+Physical Non IT assets and Safety Controls,Environment Controls,Safety Measures
+Physical Non IT assets and Safety Controls,Security Controls,Access Controls
+Physical Non IT assets and Safety Controls,Security Controls,Physical Controls
+Physical Non IT assets and Safety Controls,Security Controls,Premises Security
+Reconciliation (other than Physical Asset),Account Reconciliation,GL/Account balance
+Reconciliation (other than Physical Asset),Account Reconciliation,Inter Branch Reconciliation
+Reconciliation (other than Physical Asset),Account Reconciliation,Maker Checker
+Reconciliation (other than Physical Asset),Account Reconciliation,Suspense/Sundry reconciliation
+Reconciliation (other than Physical Asset),Bank Reconciliation,Bank Reconciliation
+Reconciliation (other than Physical Asset),Bank Reconciliation,Maker Checker
+Reconciliation (other than Physical Asset),Bank Reconciliation,Securities Reconciliation
+Reconciliation (other than Physical Asset),Circuit reconciliation,Maker Checker
+Reconciliation (other than Physical Asset),Circuit reconciliation,System reconciliation
+Reporting & Disclosures,Financial Reporting,Annual Reporting
+Reporting & Disclosures,Financial Reporting,Director Accounts
+Reporting & Disclosures,Financial Reporting,Inter-organization and Related Party Disclosure Controls
+Reporting & Disclosures,Financial Reporting,Maker Checker
+Reporting & Disclosures,Internal Reporting,Adhoc and custom
+Reporting & Disclosures,Internal Reporting,Dashboards and MIS
+Reporting & Disclosures,Branch Disclosures,Disclosures/Tariff Notices
+Reporting & Disclosures,Website Disclosures,Mandated website Disclosures
+Reporting & Disclosures,Internal MIS,Board Reports
+Reporting & Disclosures,Internal MIS,Exception Reports
+Reporting & Disclosures,Internal MIS,Maker Checker
+Reporting & Disclosures,Internal MIS,Management Reports
+Reporting & Disclosures,Regulatory Reporting,Maker Checker
+Reporting & Disclosures,Regulatory Reporting,Regulatory Reporting Calendar
+Reporting & Disclosures,Regulatory Reporting,Sign Off
+Reporting & Disclosures,Regulatory Reporting,System module
+Third Party Controls,Due Diligence,Adverse News Tracking
+Third Party Controls,Due Diligence,Conflict of Interest and Related Party checks
+Third Party Controls,Due Diligence,Maker Checker
+Third Party Controls,Due Diligence,Periodic Due Diligence including code of conduct
+Third Party Controls,Due Diligence,Pre Onboarding Assessment
+Third Party Controls,Exit Strategy,Exit Strategy
+Third Party Controls,Exit Strategy,Knowledge Transfer
+Third Party Controls,Exit Strategy,Transition Plan
+Third Party Controls,SLA and Contractual Monitoring,Monitoring of Compliance
+Third Party Controls,SLA and Contractual Monitoring,Penalty Clauses
+Third Party Controls,SLA and Contractual Monitoring,Periodic Contract Review
+Third Party Controls,SLA and Contractual Monitoring,SLAs and Contracts
+Third Party Controls,SLA and Contractual Monitoring,"Training, Certification"
+Third Party Controls,Vendor Management,Benefits Maintenance
+Third Party Controls,Vendor Management,Risk based Profiling
+Training & Employee Code of Conduct,Training,Content Review & Approval
+Training & Employee Code of Conduct,Training,Maker Checker
+Training & Employee Code of Conduct,Training,Training Assessment
+Training & Employee Code of Conduct,Training,Training Calendar
+Transaction Controls & Monitoring,Limits,Breach Escalation
+Transaction Controls & Monitoring,Limits,Limit Monitoring
+Transaction Controls & Monitoring,Limits,Limit Setting and approval
+Transaction Controls & Monitoring,Portfolio Analytics,Portfolio Monitoring
+Transaction Controls & Monitoring,Transaction Controls,Additional Review / Authentication
+Transaction Controls & Monitoring,Transaction Controls,Audit Trail
+Transaction Controls & Monitoring,Transaction Controls,Business Rule Engines
+Transaction Controls & Monitoring,Transaction Controls,Digital / Physical Signature
+Transaction Controls & Monitoring,Transaction Controls,Exception Handling
+Transaction Controls & Monitoring,Transaction Controls,Maker Checker
+Transaction Controls & Monitoring,Transaction Controls,Throughput Processing
+Transaction Controls & Monitoring,Transaction Controls,Validation Rules

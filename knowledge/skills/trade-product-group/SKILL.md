@@ -1,12 +1,13 @@
 ---
-name: human-resources
+name: trade-product-group
 description: >
-  Primary Business Unit: Human Resources.
-  Human resources policies, employee conduct, training requirements,
-  staff accountability, compensation, and workforce management.
-  Use when the paragraph mentions employee, staff, training, HR policy,
-  compensation, code of conduct, disciplinary, workforce, recruitment,
-  staff accountability, or employee benefits.
+  Primary Business Unit: Trade Product Group.
+  Retail foreign exchange operations including LRS, authorised dealer
+  categories, forex transactions for individuals, remittance limits,
+  and FEMA compliance. Use when the paragraph mentions forex, LRS,
+  remittance, authorised dealer, foreign exchange, FEMA, AD Category,
+  or retail forex operations.
+  Also covers trade finance, nostro/vostro accounts and trade products.
 ---
 
 ## Classification Values
@@ -14,31 +15,37 @@ description: >
 ### Business Unit
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Human Resources
+- Retail Branch Banking-Retail Forex — retail forex, LRS, remittances
+- Compliance-Trade Finance and FEMA — FEMA compliance matters
+- Trade Product Group — trade products (LC, guarantees, bills)
+- Operations-Trade Finance — trade finance processing
+- Operations-Nostro — nostro accounts
+- Operations-Vostro — vostro accounts
+- Credit-Business-Vostro — vostro business
 
 ### Themes
 Choose EXACTLY one value from this list and copy it verbatim. Entries are ordered by how common they are for this domain.
 
-- Policy — documented or board-approved policy requirement
 - Process — procedure or process steps to be followed
-- Governance — board/committee oversight and accountability
-- Assessment — risk/eligibility/impact assessment
-- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
-- Declaration — declarations or undertakings to be given or obtained
-- Monitoring — ongoing monitoring, review, surveillance
-- Disclosure — public or customer disclosure of information
-- Automation — automated processing or system-driven control
 - Customer Communication — communication to customers
+- Verification — verification/validation of documents, identity or data
+- Monitoring — ongoing monitoring, review, surveillance
+- Declaration — declarations or undertakings to be given or obtained
+- External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
+- Disclosure — public or customer disclosure of information
+- Notification — intimating a party of an event or change
+- Assessment — risk/eligibility/impact assessment
+- Automation — automated processing or system-driven control
 - Customer Loan Documentation — loan agreements, sanction letters, loan documents
 - Definition — paragraph defines a term or scope
-- External Communication (other than customer) — reporting or communication to regulators, authorities, third parties
+- Governance — board/committee oversight and accountability
 - Information — purely informational or background text
 - Internal Communication — communication within the organisation
-- Notification — intimating a party of an event or change
+- Internal Communication (within bank, staff, branches) — instructions and circulars to staff and branches
+- Policy — documented or board-approved policy requirement
 - Storage and records keeping — retention and maintenance of records
 - System configuration — system parameters, limits or configuration
 - Themes/ Other Attributes — only when no other theme applies
-- Verification — verification/validation of documents, identity or data
 
 ### Levels
 
@@ -236,26 +243,26 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 
 ### Control Objectives
 - Process and Policy
+- Compliance Monitoring
 - Documentation
 - Communication
-- Segregation of Duties
 
 ## Few-Shot Examples
 
 ### Example 1
-**Paragraph**: "Banks shall ensure that all staff handling customer transactions undergo mandatory training on AML/CFT procedures at least once a year."
+**Paragraph**: "AD Category-I banks may allow remittances under the Liberalised Remittance Scheme up to USD 2,50,000 per financial year for any permitted current or capital account transaction."
 
 **Classification**:
 - para_type: "Action Para"
 - has_effective_date: "No"
 - effective_date: null
-- business_unit: "Human Resources"
+- business_unit: "Retail Branch Banking-Retail Forex"
 - theme: "Process"
 - control_object_name: "Process and Policy"
 - level_1: "Information Technology & Cyber Security"
 - level_2: "Operations Management"
 - level_3: "Exception Handling"
-- actionable: "Conduct mandatory annual AML/CFT training for all customer-facing staff"
+- actionable: "Ensure AD Cat-I branches allow LRS remittances up to USD 250,000 per FY for permitted transactions"
 
 ### Example 2
 **Paragraph**: "The revised instructions and system requirements shall take effect from October 01, 2025. All entities shall ensure necessary operational readiness before October 01, 2025."
@@ -264,7 +271,7 @@ Choose EXACTLY one value from this list and copy it verbatim. Entries are ordere
 - para_type: "Future Effective"
 - has_effective_date: "Yes"
 - effective_date: "01/10/2025"
-- business_unit: "Human Resources"
+- business_unit: "Trade Product Group"
 - theme: "Process"
 - control_object_name: "Process and Policy"
 - level_1: "Governance"
